@@ -22,6 +22,13 @@
 		2E245CEB2E534D430085B958 /* GeoEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CEA2E534D430085B958 /* GeoEntry.swift */; };
 		2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CEC2E5358B90085B958 /* MediaEntry.swift */; };
 		2E245CF12E537B670085B958 /* CoreStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF02E537B670085B958 /* CoreStoreTests.swift */; };
+		2E245CFA2E539A630085B958 /* HomeInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF42E539A630085B958 /* HomeInteractor.swift */; };
+		2E245CFB2E539A630085B958 /* HomeRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF72E539A630085B958 /* HomeRouter.swift */; };
+		2E245CFC2E539A630085B958 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF82E539A630085B958 /* HomeViewController.swift */; };
+		2E245CFD2E539A630085B958 /* HomeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF52E539A630085B958 /* HomeModels.swift */; };
+		2E245CFE2E539A630085B958 /* HomePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF62E539A630085B958 /* HomePresenter.swift */; };
+		2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF92E539A630085B958 /* HomeWorker.swift */; };
+		2E245D012E539ABD0085B958 /* HomeConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245D002E539ABD0085B958 /* HomeConfigurator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +66,13 @@
 		2E245CEA2E534D430085B958 /* GeoEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoEntry.swift; sourceTree = "<group>"; };
 		2E245CEC2E5358B90085B958 /* MediaEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
 		2E245CF02E537B670085B958 /* CoreStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreStoreTests.swift; sourceTree = "<group>"; };
+		2E245CF42E539A630085B958 /* HomeInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeInteractor.swift; sourceTree = "<group>"; };
+		2E245CF52E539A630085B958 /* HomeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeModels.swift; sourceTree = "<group>"; };
+		2E245CF62E539A630085B958 /* HomePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenter.swift; sourceTree = "<group>"; };
+		2E245CF72E539A630085B958 /* HomeRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRouter.swift; sourceTree = "<group>"; };
+		2E245CF82E539A630085B958 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		2E245CF92E539A630085B958 /* HomeWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWorker.swift; sourceTree = "<group>"; };
+		2E245D002E539ABD0085B958 /* HomeConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeConfigurator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +127,7 @@
 		2E245CA52E5317900085B958 /* GeoMemories */ = {
 			isa = PBXGroup;
 			children = (
+				2E245CF22E539A490085B958 /* Scenes */,
 				2E245CE92E534C990085B958 /* Models */,
 				2E245CCE2E5338C10085B958 /* Workers */,
 				2E245CB42E5317EE0085B958 /* LaunchScreen */,
@@ -174,6 +189,28 @@
 				2E245CEC2E5358B90085B958 /* MediaEntry.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		2E245CF22E539A490085B958 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				2E245CF32E539A510085B958 /* Home */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		2E245CF32E539A510085B958 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				2E245CF72E539A630085B958 /* HomeRouter.swift */,
+				2E245CF82E539A630085B958 /* HomeViewController.swift */,
+				2E245CF42E539A630085B958 /* HomeInteractor.swift */,
+				2E245CF62E539A630085B958 /* HomePresenter.swift */,
+				2E245CF52E539A630085B958 /* HomeModels.swift */,
+				2E245CF92E539A630085B958 /* HomeWorker.swift */,
+				2E245D002E539ABD0085B958 /* HomeConfigurator.swift */,
+			);
+			path = Home;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -327,7 +364,14 @@
 			files = (
 				2E245CD02E5338CF0085B958 /* LocationWorker.swift in Sources */,
 				2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */,
+				2E245CFA2E539A630085B958 /* HomeInteractor.swift in Sources */,
+				2E245CFB2E539A630085B958 /* HomeRouter.swift in Sources */,
+				2E245CFC2E539A630085B958 /* HomeViewController.swift in Sources */,
+				2E245CFD2E539A630085B958 /* HomeModels.swift in Sources */,
+				2E245CFE2E539A630085B958 /* HomePresenter.swift in Sources */,
+				2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */,
 				2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */,
+				2E245D012E539ABD0085B958 /* HomeConfigurator.swift in Sources */,
 				2E245CEB2E534D430085B958 /* GeoEntry.swift in Sources */,
 				2E245CAA2E5317900085B958 /* SceneDelegate.swift in Sources */,
 			);

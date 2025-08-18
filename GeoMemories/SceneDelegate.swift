@@ -34,11 +34,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CoreStoreConfiguratorPr
     }
     
     private func setupRootViewController() {
-//        let mainViewController = HomeConfigurator.createScene(dataStack)
-//
-//        let navigationController = UINavigationController(rootViewController: mainViewController)
-//        
-//        window?.rootViewController = navigationController
+        let mainViewController = HomeConfigurator.shared.createScene(with: dataStack)
+
+        let navigationController = UINavigationController(rootViewController: mainViewController)
+        
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
     
