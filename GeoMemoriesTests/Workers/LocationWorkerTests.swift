@@ -22,6 +22,14 @@ class MockLocationManager: LocationManagerProtocol {
     func requestWhenInUseAuthorization() {
         didRequestAuthorization = true
     }
+    
+    func requestLocation() {
+        <#code#>
+    }
+    
+    func stopMonitoringVisits() {
+        <#code#>
+    }
 }
 
 class LocationWorkerTests: XCTestCase {

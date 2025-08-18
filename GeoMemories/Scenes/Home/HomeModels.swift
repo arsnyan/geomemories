@@ -10,10 +10,87 @@
 //  see http://clean-swift.com
 //
 
+import CoreLocation
+
+// swiftlint:disable nesting
 enum Home {
- 
     // MARK: Use cases
-    enum Something {
+    enum ShowMapEntries {
+        struct Request {
+            
+        }
+        
+        struct Response {
+            
+        }
+        
+        struct ViewModel {
+            
+        }
+    }
+    
+    enum SelectCurrentLocation {
+        struct Request {
+            
+        }
+        
+        enum Response {
+            case loading
+            case success(location: CLLocation)
+            case failure(error: LocationError)
+        }
+        
+        struct ViewModel {
+            let locationCenter: CLLocationCoordinate2D
+            let areaRadius: CLLocationDistance
+        }
+    }
+    
+    enum ShowAlert {
+        struct Request {
+            
+        }
+        
+        struct Response {
+            let titleKey: String
+            let messageKey: String
+        }
+        
+        struct ViewModel {
+            let title: String
+            let message: String
+        }
+    }
+    
+    enum AddEntry {
+        struct Request {
+            
+        }
+        
+        struct Response {
+            
+        }
+        
+        struct ViewModel {
+            
+        }
+    }
+    
+    enum ShowAnnotationPopover {
+        struct Request {
+            
+        }
+        
+        struct Response {
+            
+        }
+        
+        struct ViewModel {
+            
+        }
+    }
+    
+    enum ShowEntryDetailsScreen {
         struct Request {
             
         }

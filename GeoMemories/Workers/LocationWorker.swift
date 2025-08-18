@@ -11,48 +11,95 @@
 //
 
 import CoreLocation
+import Combine
 
 protocol LocationManagerProtocol: AnyObject {
     var authorizationStatus: CLAuthorizationStatus { get }
     var delegate: CLLocationManagerDelegate? { get set }
     func requestWhenInUseAuthorization()
+    func requestLocation()
+    func stopMonitoringVisits()
 }
 
 extension CLLocationManager: LocationManagerProtocol {}
 
+enum LocationError: LocalizedError {
+    case permissionDenied
+    case failedToFetchLocation(Error)
+    case unknown
+    
+    var errorDescription: String? {
+        switch self {
+        case .permissionDenied:
+            return "Permission denied to access location"
+        case .failedToFetchLocation(let error):
+            return "Failed to fetch location: \(error.localizedDescription)"
+        case .unknown:
+            return "Unknown error"
+        }
+    }
+}
+
 class LocationWorker: NSObject, CLLocationManagerDelegate {
     private let locationManager: LocationManagerProtocol
-    private var completion: ((Bool) -> Void)?
+    private let locationSubject = PassthroughSubject<CLLocation, Error>()
     
     init(locationManager: LocationManagerProtocol = CLLocationManager()) {
         self.locationManager = locationManager
         super.init()
+        self.locationManager.delegate = self
     }
     
-    func checkOrRequestLocationPermission(completion: @escaping (Bool) -> Void) {
-        self.completion = completion
-        locationManager.delegate = self as CLLocationManagerDelegate
-        
-        switch locationManager.authorizationStatus {
-        case .notDetermined:
-            locationManager.requestWhenInUseAuthorization()
-        case .restricted, .denied:
-            completion(false)
-        case .authorizedAlways, .authorizedWhenInUse:
-            completion(true)
-        @unknown default:
-            completion(false)
+    func getCurrentLocation() -> AnyPublisher<CLLocation, LocationError> {
+        return Future<Void, LocationError> { [weak self] promise in
+            guard let self else { return promise(.failure(.unknown)) }
+            
+            switch self.locationManager.authorizationStatus {
+            case .notDetermined:
+                self.locationManager.requestWhenInUseAuthorization()
+                promise(.success(()))
+            case .restricted, .denied:
+                promise(.failure(.permissionDenied))
+            case .authorizedAlways, .authorizedWhenInUse:
+                promise(.success(()))
+            @unknown default:
+                promise(.failure(.unknown))
+            }
         }
+        .flatMap { [weak self] () -> AnyPublisher<CLLocation, LocationError> in
+            guard let self else {
+                return Fail(error: LocationError.unknown).eraseToAnyPublisher()
+            }
+            
+            self.locationManager.requestLocation()
+            
+            return self.locationSubject
+                .mapError { .failedToFetchLocation($0) }
+                .first()
+                .eraseToAnyPublisher()
+        }
+        .eraseToAnyPublisher()
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .restricted, .denied:
-            completion?(false)
+            locationSubject.send(completion: .failure(LocationError.permissionDenied))
         case .authorizedAlways, .authorizedWhenInUse:
-            completion?(true)
+            break
         default:
             break
         }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            locationSubject.send(location)
+            locationSubject.send(completion: .finished)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        locationSubject.send(completion: .failure(error))
     }
 }

@@ -11,19 +11,50 @@
 //
 
 import UIKit
+import SnapKit
+import MapKit
 
 protocol HomeDisplayLogic: AnyObject {
-    func displaySomething(viewModel: Home.Something.ViewModel)
+    func displayAlert(viewModel: Home.ShowAlert.ViewModel)
+    func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel)
+    func displayLoadingIndicator()
+    func stopLoadingIndicator()
 }
 
 class HomeViewController: UIViewController {
     var interactor: HomeBusinessLogic?
     var router: (NSObjectProtocol & HomeRoutingLogic & HomeDataPassing)?
     
+    private let mapView: MKMapView = {
+        let map = MKMapView()
+        return map
+    }()
+    
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.center = view.center
+        return indicator
+    }()
+    
     // MARK: View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        doSomething()
+        toolbarItems = [
+            .flexibleSpace(),
+            UIBarButtonItem(
+                image: UIImage(systemName: "location.fill"),
+                style: .plain,
+                target: self,
+                action: #selector(selectCurrentLocation)
+            )
+        ]
+        navigationController?.setToolbarHidden(false, animated: false)
+        
+        view.addSubview(mapView)
+        mapView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     // MARK: Routing
@@ -35,15 +66,44 @@ class HomeViewController: UIViewController {
             }
         }
     }
-        
-    private func doSomething() {
-        let request = Home.Something.Request()
-        interactor?.doSomething(request: request)
+    
+    @objc private func selectCurrentLocation() {
+        interactor?.provideCurrentLocation(request: Home.SelectCurrentLocation.Request())
     }
 }
 
 extension HomeViewController: HomeDisplayLogic {
-    func displaySomething(viewModel: Home.Something.ViewModel) {
-        
+    func displayAlert(viewModel: Home.ShowAlert.ViewModel) {
+        let alertController = UIAlertController(
+            title: viewModel.title,
+            message: viewModel.message,
+            preferredStyle: .alert
+        )
+        alertController.addAction(
+            UIAlertAction(
+                title: "ok",
+                style: .default
+            )
+        )
+        present(alertController, animated: true)
+    }
+    
+    func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel) {
+        mapView.setRegion(
+            MKCoordinateRegion(
+                center: viewModel.locationCenter,
+                latitudinalMeters: viewModel.areaRadius,
+                longitudinalMeters: viewModel.areaRadius
+            ),
+            animated: true
+        )
+    }
+    
+    func displayLoadingIndicator() {
+        activityIndicator.startAnimating()
+    }
+    
+    func stopLoadingIndicator() {
+        activityIndicator.stopAnimating()
     }
 }

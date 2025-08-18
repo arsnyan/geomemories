@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "genericErrorTitle" : {
+
+    },
+    "locationServicesNotAuthorizedMessage" : {
+
+    },
+    "locationServicesNotAuthorizedTitle" : {
+
+    },
+    "noLocalizedErrorMessage" : {
+
+    },
     "NSLocationWhenInUseUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {

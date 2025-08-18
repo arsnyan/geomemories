@@ -10,15 +10,41 @@
 //  see http://clean-swift.com
 //
 
+import CoreLocation
+
 protocol HomePresentationLogic {
-    func presentSomething(response: Home.Something.Response)
+    func presentCurrentLocation(response: Home.SelectCurrentLocation.Response)
 }
 
 class HomePresenter: HomePresentationLogic {
     weak var viewController: HomeDisplayLogic?
     
-    func presentSomething(response: Home.Something.Response) {
-        let viewModel = Home.Something.ViewModel()
-        viewController?.displaySomething(viewModel: viewModel)
+    func presentCurrentLocation(response: Home.SelectCurrentLocation.Response) {
+        switch response {
+        case .loading:
+            viewController?.displayLoadingIndicator()
+        case .success(let location):
+            let viewModel = Home.SelectCurrentLocation.ViewModel(
+                locationCenter: location.coordinate,
+                areaRadius: 1000
+            )
+            viewController?.displayCurrentLocation(viewModel: viewModel)
+            viewController?.stopLoadingIndicator()
+        case .failure(let error):
+            let title: String
+            let message: String
+            
+            if case .permissionDenied = error {
+                title = String(localized: "locationServicesNotAuthorizedTitle")
+                message = String(localized: "locationServicesNotAuthorizedMessage")
+            } else {
+                title = String(localized: "genericErrorTitle")
+                message = String(localized: "noLocalizedErrorMessage") + "\n\(error.localizedDescription)"
+            }
+            
+            let viewModel = Home.ShowAlert.ViewModel(title: title, message: message)
+            viewController?.displayAlert(viewModel: viewModel)
+            viewController?.stopLoadingIndicator()
+        }
     }
 }

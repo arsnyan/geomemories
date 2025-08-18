@@ -10,24 +10,63 @@
 //  see http://clean-swift.com
 //
 
+import Foundation
+import Combine
+
 protocol HomeBusinessLogic {
-    func doSomething(request: Home.Something.Request)
+    func provideCurrentLocation(request: Home.SelectCurrentLocation.Request)
+    func provideMapEntries(request: Home.ShowMapEntries.Request)
+    func addMapEntry(request: Home.AddEntry.Request)
+    func provideEntryCallout(request: Home.ShowAnnotationPopover.Request)
 }
 
 protocol HomeDataStore {
-    
+    var entries: [GeoEntry] { get }
 }
 
 class HomeInteractor: HomeBusinessLogic, HomeDataStore {
-    
+    var entries: [GeoEntry] = []
     var presenter: HomePresentationLogic?
-    var worker: HomeWorker?
+    let worker: LocationWorker = LocationWorker()
     
-    func doSomething(request: Home.Something.Request) {
-        worker = HomeWorker()
-        worker?.doSomeWork()
+    private var locationCancellable: AnyCancellable?
+    
+    deinit {
+        locationCancellable?.cancel()
+    }
+    
+    func provideCurrentLocation(request: Home.SelectCurrentLocation.Request) {
+        presenter?.presentCurrentLocation(response: .loading)
         
-        let response = Home.Something.Response()
-        presenter?.presentSomething(response: response)
+        locationCancellable = worker.getCurrentLocation()
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case .failure(let error) = completion {
+                        let response = Home.SelectCurrentLocation.Response.failure(
+                            error: error
+                        )
+                        self?.presenter?.presentCurrentLocation(response: response)
+                    }
+                },
+                receiveValue: { [weak self] location in
+                    let response = Home.SelectCurrentLocation.Response.success(
+                        location: location
+                    )
+                    self?.presenter?.presentCurrentLocation(response: response)
+                }
+            )
+    }
+    
+    func provideMapEntries(request: Home.ShowMapEntries.Request) {
+        
+    }
+    
+    func addMapEntry(request: Home.AddEntry.Request) {
+        
+    }
+    
+    func provideEntryCallout(request: Home.ShowAnnotationPopover.Request) {
+        
     }
 }
