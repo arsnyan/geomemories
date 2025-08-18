@@ -1,9 +1,0 @@
-/* 
-  InfoPlist.strings
-  GeoMemories
-
-  Created by Арсен Саруханян on 18.08.2025.
-  
-*/
-
-"NSLocationWhenInUseUsageDescription" = "Для отображения текущей геопозиции и автоматической вставки вашей локации в поля, нужно дать доступ к геопозиции для приложения"

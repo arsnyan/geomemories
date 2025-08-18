@@ -1,9 +1,0 @@
-/* 
-  InfoPlist.strings
-  GeoMemories
-
-  Created by Арсен Саруханян on 18.08.2025.
-  
-*/
-
-"NSLocationWhenInUseUsageDescription" = "We need your location to present it on the map and/or putting it into fields automatically"
