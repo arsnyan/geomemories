@@ -8,7 +8,6 @@
 import Foundation
 import CoreStore
 
-@MainActor
 class GeoEntry: CoreStoreObject {
     @Field.Stored("id")
     var id: UUID = UUID()
