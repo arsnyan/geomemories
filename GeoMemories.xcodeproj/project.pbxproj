@@ -14,6 +14,9 @@
 		2E245CAE2E53179F0085B958 /* GeoMemoriesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CAC2E53179F0085B958 /* GeoMemoriesTests.swift */; };
 		2E245CB22E5317A10085B958 /* GeoMemoriesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CAF2E5317A10085B958 /* GeoMemoriesUITests.swift */; };
 		2E245CB32E5317A10085B958 /* GeoMemoriesUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CB02E5317A10085B958 /* GeoMemoriesUITestsLaunchTests.swift */; };
+		2E245CB72E531C120085B958 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CB62E531C120085B958 /* KeychainAccess */; };
+		2E245CBB2E531F860085B958 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CBA2E531F860085B958 /* SnapKit */; };
+		2E245CC12E5321A70085B958 /* CoreStore in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CC02E5321A70085B958 /* CoreStore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +55,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E245CB72E531C120085B958 /* KeychainAccess in Frameworks */,
+				2E245CC12E5321A70085B958 /* CoreStore in Frameworks */,
+				2E245CBB2E531F860085B958 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,7 +101,7 @@
 		2E245CA52E5317900085B958 /* GeoMemories */ = {
 			isa = PBXGroup;
 			children = (
-				2E245CB42E5317EE0085B958 /* Storyboards */,
+				2E245CB42E5317EE0085B958 /* LaunchScreen */,
 				2E245CA02E5317900085B958 /* Assets.xcassets */,
 				2E245C9F2E5317900085B958 /* AppDelegate.swift */,
 				2E245CA42E5317900085B958 /* SceneDelegate.swift */,
@@ -121,12 +127,12 @@
 			path = GeoMemoriesUITests;
 			sourceTree = "<group>";
 		};
-		2E245CB42E5317EE0085B958 /* Storyboards */ = {
+		2E245CB42E5317EE0085B958 /* LaunchScreen */ = {
 			isa = PBXGroup;
 			children = (
 				2E245CA32E5317900085B958 /* LaunchScreen.storyboard */,
 			);
-			path = Storyboards;
+			path = LaunchScreen;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,9 +149,13 @@
 			buildRules = (
 			);
 			dependencies = (
+				2E245CC32E53242A0085B958 /* PBXTargetDependency */,
 			);
 			name = GeoMemories;
 			packageProductDependencies = (
+				2E245CB62E531C120085B958 /* KeychainAccess */,
+				2E245CBA2E531F860085B958 /* SnapKit */,
+				2E245CC02E5321A70085B958 /* CoreStore */,
 			);
 			productName = GeoMemories;
 			productReference = 2E245C6B2E5316710085B958 /* GeoMemories.app */;
@@ -223,6 +233,12 @@
 			);
 			mainGroup = 2E245C622E5316710085B958;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2E245CB52E531C120085B958 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				2E245CB82E531C540085B958 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				2E245CB92E531F860085B958 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				2E245CBF2E5321A70085B958 /* XCRemoteSwiftPackageReference "CoreStore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2E245C6C2E5316710085B958 /* Products */;
 			projectDirPath = "";
@@ -301,6 +317,10 @@
 			target = 2E245C6A2E5316710085B958 /* GeoMemories */;
 			targetProxy = 2E245C8C2E5316720085B958 /* PBXContainerItemProxy */;
 		};
+		2E245CC32E53242A0085B958 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 2E245CC22E53242A0085B958 /* SwiftLintBuildToolPlugin */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -330,6 +350,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -366,6 +387,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -425,7 +447,7 @@
 				DEVELOPMENT_TEAM = 7K76YFF2Z8;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -489,7 +511,7 @@
 				DEVELOPMENT_TEAM = 7K76YFF2Z8;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -632,6 +654,64 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2E245CB52E531C120085B958 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		2E245CB82E531C540085B958 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.59.1;
+			};
+		};
+		2E245CB92E531F860085B958 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		2E245CBF2E5321A70085B958 /* XCRemoteSwiftPackageReference "CoreStore" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JohnEstropia/CoreStore.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2E245CB62E531C120085B958 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E245CB52E531C120085B958 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		2E245CBA2E531F860085B958 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E245CB92E531F860085B958 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		2E245CC02E5321A70085B958 /* CoreStore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E245CBF2E5321A70085B958 /* XCRemoteSwiftPackageReference "CoreStore" */;
+			productName = CoreStore;
+		};
+		2E245CC22E53242A0085B958 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E245CB82E531C540085B958 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2E245C632E5316710085B958 /* Project object */;
 }
