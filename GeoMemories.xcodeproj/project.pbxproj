@@ -17,6 +17,8 @@
 		2E245CB72E531C120085B958 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CB62E531C120085B958 /* KeychainAccess */; };
 		2E245CBB2E531F860085B958 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CBA2E531F860085B958 /* SnapKit */; };
 		2E245CC12E5321A70085B958 /* CoreStore in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CC02E5321A70085B958 /* CoreStore */; };
+		2E245CC82E5336260085B958 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CC72E5336260085B958 /* Localizable.xcstrings */; };
+		2E245CCB2E5336370085B958 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CC92E5336370085B958 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +50,9 @@
 		2E245CAC2E53179F0085B958 /* GeoMemoriesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMemoriesTests.swift; sourceTree = "<group>"; };
 		2E245CAF2E5317A10085B958 /* GeoMemoriesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMemoriesUITests.swift; sourceTree = "<group>"; };
 		2E245CB02E5317A10085B958 /* GeoMemoriesUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMemoriesUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		2E245CC72E5336260085B958 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		2E245CCA2E5336370085B958 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		2E245CCD2E5336560085B958 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +111,8 @@
 				2E245C9F2E5317900085B958 /* AppDelegate.swift */,
 				2E245CA42E5317900085B958 /* SceneDelegate.swift */,
 				2E245CA12E5317900085B958 /* Info.plist */,
+				2E245CC72E5336260085B958 /* Localizable.xcstrings */,
+				2E245CC92E5336370085B958 /* InfoPlist.strings */,
 			);
 			path = GeoMemories;
 			sourceTree = "<group>";
@@ -230,6 +237,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 2E245C622E5316710085B958;
 			minimizedProjectReferenceProxies = 1;
@@ -257,7 +265,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E245CA62E5317900085B958 /* Assets.xcassets in Resources */,
+				2E245CCB2E5336370085B958 /* InfoPlist.strings in Resources */,
 				2E245CA82E5317900085B958 /* LaunchScreen.storyboard in Resources */,
+				2E245CC82E5336260085B958 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,6 +340,15 @@
 				2E245CA22E5317900085B958 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		2E245CC92E5336370085B958 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2E245CCA2E5336370085B958 /* en */,
+				2E245CCD2E5336560085B958 /* ru */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -414,6 +433,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -469,6 +489,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -478,6 +499,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -526,6 +548,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
