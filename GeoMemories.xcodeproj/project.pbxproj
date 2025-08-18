@@ -20,6 +20,8 @@
 		2E245CC82E5336260085B958 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CC72E5336260085B958 /* Localizable.xcstrings */; };
 		2E245CD02E5338CF0085B958 /* LocationWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CCF2E5338CF0085B958 /* LocationWorker.swift */; };
 		2E245CD92E533FFE0085B958 /* LocationWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CD52E533FFE0085B958 /* LocationWorkerTests.swift */; };
+		2E245CEB2E534D430085B958 /* GeoEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CEA2E534D430085B958 /* GeoEntry.swift */; };
+		2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CEC2E5358B90085B958 /* MediaEntry.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,8 @@
 		2E245CCF2E5338CF0085B958 /* LocationWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationWorker.swift; sourceTree = "<group>"; };
 		2E245CD52E533FFE0085B958 /* LocationWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationWorkerTests.swift; sourceTree = "<group>"; };
 		2E245CDD2E5345FE0085B958 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = .swiftlint.yml; sourceTree = "<group>"; };
+		2E245CEA2E534D430085B958 /* GeoEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoEntry.swift; sourceTree = "<group>"; };
+		2E245CEC2E5358B90085B958 /* MediaEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +113,7 @@
 		2E245CA52E5317900085B958 /* GeoMemories */ = {
 			isa = PBXGroup;
 			children = (
+				2E245CE92E534C990085B958 /* Models */,
 				2E245CCE2E5338C10085B958 /* Workers */,
 				2E245CB42E5317EE0085B958 /* LaunchScreen */,
 				2E245CA02E5317900085B958 /* Assets.xcassets */,
@@ -160,6 +165,15 @@
 				2E245CD52E533FFE0085B958 /* LocationWorkerTests.swift */,
 			);
 			path = Workers;
+			sourceTree = "<group>";
+		};
+		2E245CE92E534C990085B958 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				2E245CEA2E534D430085B958 /* GeoEntry.swift */,
+				2E245CEC2E5358B90085B958 /* MediaEntry.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -313,6 +327,8 @@
 			files = (
 				2E245CD02E5338CF0085B958 /* LocationWorker.swift in Sources */,
 				2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */,
+				2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */,
+				2E245CEB2E534D430085B958 /* GeoEntry.swift in Sources */,
 				2E245CAA2E5317900085B958 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -395,7 +411,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -432,7 +448,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
