@@ -11,7 +11,6 @@
 		2E245CA82E5317900085B958 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CA32E5317900085B958 /* LaunchScreen.storyboard */; };
 		2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245C9F2E5317900085B958 /* AppDelegate.swift */; };
 		2E245CAA2E5317900085B958 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CA42E5317900085B958 /* SceneDelegate.swift */; };
-		2E245CAE2E53179F0085B958 /* GeoMemoriesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CAC2E53179F0085B958 /* GeoMemoriesTests.swift */; };
 		2E245CB22E5317A10085B958 /* GeoMemoriesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CAF2E5317A10085B958 /* GeoMemoriesUITests.swift */; };
 		2E245CB32E5317A10085B958 /* GeoMemoriesUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CB02E5317A10085B958 /* GeoMemoriesUITestsLaunchTests.swift */; };
 		2E245CB72E531C120085B958 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CB62E531C120085B958 /* KeychainAccess */; };
@@ -22,6 +21,7 @@
 		2E245CD92E533FFE0085B958 /* LocationWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CD52E533FFE0085B958 /* LocationWorkerTests.swift */; };
 		2E245CEB2E534D430085B958 /* GeoEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CEA2E534D430085B958 /* GeoEntry.swift */; };
 		2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CEC2E5358B90085B958 /* MediaEntry.swift */; };
+		2E245CF12E537B670085B958 /* CoreStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF02E537B670085B958 /* CoreStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +50,6 @@
 		2E245CA12E5317900085B958 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E245CA22E5317900085B958 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2E245CA42E5317900085B958 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		2E245CAC2E53179F0085B958 /* GeoMemoriesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMemoriesTests.swift; sourceTree = "<group>"; };
 		2E245CAF2E5317A10085B958 /* GeoMemoriesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMemoriesUITests.swift; sourceTree = "<group>"; };
 		2E245CB02E5317A10085B958 /* GeoMemoriesUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMemoriesUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		2E245CC72E5336260085B958 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -59,6 +58,7 @@
 		2E245CDD2E5345FE0085B958 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = .swiftlint.yml; sourceTree = "<group>"; };
 		2E245CEA2E534D430085B958 /* GeoEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoEntry.swift; sourceTree = "<group>"; };
 		2E245CEC2E5358B90085B958 /* MediaEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
+		2E245CF02E537B670085B958 /* CoreStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreStoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,7 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				2E245CD12E533FD50085B958 /* Workers */,
-				2E245CAC2E53179F0085B958 /* GeoMemoriesTests.swift */,
+				2E245CF02E537B670085B958 /* CoreStoreTests.swift */,
 			);
 			path = GeoMemoriesTests;
 			sourceTree = "<group>";
@@ -337,7 +337,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2E245CAE2E53179F0085B958 /* GeoMemoriesTests.swift in Sources */,
+				2E245CF12E537B670085B958 /* CoreStoreTests.swift in Sources */,
 				2E245CD92E533FFE0085B958 /* LocationWorkerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
