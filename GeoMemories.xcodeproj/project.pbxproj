@@ -33,6 +33,7 @@
 		2E245D0C2E53A43D0085B958 /* HomeWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245D0A2E53A43D0085B958 /* HomeWorkerTests.swift */; };
 		2E245D0D2E53A43D0085B958 /* HomeViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245D092E53A43D0085B958 /* HomeViewControllerTests.swift */; };
 		2E245D0E2E53A43D0085B958 /* HomeInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245D072E53A43D0085B958 /* HomeInteractorTests.swift */; };
+		2EDB163F2E53CC330002C812 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		2E245D082E53A43D0085B958 /* HomePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenterTests.swift; sourceTree = "<group>"; };
 		2E245D092E53A43D0085B958 /* HomeViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewControllerTests.swift; sourceTree = "<group>"; };
 		2E245D0A2E53A43D0085B958 /* HomeWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWorkerTests.swift; sourceTree = "<group>"; };
+		2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +145,7 @@
 				2E245C9F2E5317900085B958 /* AppDelegate.swift */,
 				2E245CA42E5317900085B958 /* SceneDelegate.swift */,
 				2E245CA12E5317900085B958 /* Info.plist */,
+				2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */,
 				2E245CC72E5336260085B958 /* Localizable.xcstrings */,
 			);
 			path = GeoMemories;
@@ -365,6 +368,7 @@
 			files = (
 				2E245CA62E5317900085B958 /* Assets.xcassets in Resources */,
 				2E245CA82E5317900085B958 /* LaunchScreen.storyboard in Resources */,
+				2EDB163F2E53CC330002C812 /* InfoPlist.xcstrings in Resources */,
 				2E245CC82E5336260085B958 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

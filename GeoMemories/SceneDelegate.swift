@@ -43,8 +43,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CoreStoreConfiguratorPr
     }
     
     private func showAlert(_ error: Error) {
-        let alertController = UIAlertController(title: "error", message: error.localizedDescription, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "ok", style: .default))
+        let alertController = UIAlertController(
+            title: String(localized: "error"),
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alertController.addAction(
+            UIAlertAction(
+                title: String(localized: "ok"),
+                style: .default
+            )
+        )
         window?.rootViewController?.present(alertController, animated: true)
     }
     

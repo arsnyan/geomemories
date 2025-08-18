@@ -1,31 +1,98 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "genericErrorTitle" : {
-
-    },
-    "locationServicesNotAuthorizedMessage" : {
-
-    },
-    "locationServicesNotAuthorizedTitle" : {
-
-    },
-    "noLocalizedErrorMessage" : {
-
-    },
-    "NSLocationWhenInUseUsageDescription" : {
-      "extractionState" : "manual",
+    "error" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "We need your location to show it on the map view and so you can quickly select your location in any field of this application"
+            "value" : "Error"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Нам нужен доступ к сервисам геопозиции, чтобы мы могли отображать ваше текущее местоположение на карте, а также автоматически подставлять его в поля приложения"
+            "value" : "Ошибка"
+          }
+        }
+      }
+    },
+    "genericErrorTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так"
+          }
+        }
+      }
+    },
+    "locationServicesNotAuthorizedMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We can’t access your location services because you denied the permission previously requested"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы не дали доступ к сервисам геолокации, поэтому воспользоваться этой функцией не получтся"
+          }
+        }
+      }
+    },
+    "locationServicesNotAuthorizedTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location permissions were denied"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Геолокация недоступна"
+          }
+        }
+      }
+    },
+    "noLocalizedErrorMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There was an unexpected error that we didn’t handle. Please message us about it:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка, о которой стоит сообщить разработчикам:"
+          }
+        }
+      }
+    },
+    "ok" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хорошо"
           }
         }
       }

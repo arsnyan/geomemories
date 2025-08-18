@@ -81,7 +81,7 @@ extension HomeViewController: HomeDisplayLogic {
         )
         alertController.addAction(
             UIAlertAction(
-                title: "ok",
+                title: String(localized: "ok"),
                 style: .default
             )
         )
