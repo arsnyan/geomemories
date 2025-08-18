@@ -16,7 +16,7 @@ class GeoEntry: CoreStoreObject {
     @Field.Stored("title")
     var title: String = ""
     
-    @Field.Stored("description")
+    @Field.Stored("entry_description")
     var description: String = ""
     
     @Field.Stored("latitude")

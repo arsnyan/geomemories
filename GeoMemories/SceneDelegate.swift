@@ -53,6 +53,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func configureCoreStore() {
+        configureDataStack()
+        
         dataStack.reactive
             .addStorage(
                 SQLiteStore(
