@@ -27,6 +27,7 @@ class HomeViewController: UIViewController {
     
     private let mapView: MKMapView = {
         let map = MKMapView()
+        map.showsUserLocation = true
         return map
     }()
     
