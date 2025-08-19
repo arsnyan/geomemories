@@ -17,8 +17,8 @@ protocol LocationManagerProtocol: AnyObject {
     var authorizationStatus: CLAuthorizationStatus { get }
     var delegate: CLLocationManagerDelegate? { get set }
     func requestWhenInUseAuthorization()
+    
     func requestLocation()
-    func stopMonitoringVisits()
 }
 
 extension CLLocationManager: LocationManagerProtocol {}
@@ -44,6 +44,10 @@ class LocationWorker: NSObject, CLLocationManagerDelegate {
     private let locationManager: LocationManagerProtocol
     private let locationSubject = PassthroughSubject<CLLocation, Error>()
     
+    private var lastLocation: CLLocation?
+    private var lastLocationTimestamp: Date?
+    private let cacheValidityDuration: TimeInterval = 5 * 60
+    
     init(locationManager: LocationManagerProtocol = CLLocationManager()) {
         self.locationManager = locationManager
         super.init()
@@ -51,6 +55,14 @@ class LocationWorker: NSObject, CLLocationManagerDelegate {
     }
     
     func getCurrentLocation() -> AnyPublisher<CLLocation, LocationError> {
+        if let lastLocation = lastLocation,
+           let lastLocationTimeStamp = lastLocationTimestamp,
+           Date().timeIntervalSince(lastLocationTimeStamp) < cacheValidityDuration {
+            return Just(lastLocation)
+                .setFailureType(to: LocationError.self)
+                .eraseToAnyPublisher()
+        }
+        
         return Future<Void, LocationError> { [weak self] promise in
             guard let self else { return promise(.failure(.unknown)) }
             
@@ -85,6 +97,8 @@ class LocationWorker: NSObject, CLLocationManagerDelegate {
         switch manager.authorizationStatus {
         case .restricted, .denied:
             locationSubject.send(completion: .failure(LocationError.permissionDenied))
+            lastLocation = nil
+            lastLocationTimestamp = nil
         case .authorizedAlways, .authorizedWhenInUse:
             break
         default:
@@ -94,6 +108,9 @@ class LocationWorker: NSObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
+            lastLocation = location
+            lastLocationTimestamp = Date()
+            
             locationSubject.send(location)
             locationSubject.send(completion: .finished)
         }

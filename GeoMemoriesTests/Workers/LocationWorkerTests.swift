@@ -13,27 +13,39 @@
 @testable import GeoMemories
 import CoreLocation
 import XCTest
+import Combine
 
 class MockLocationManager: LocationManagerProtocol {
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var delegate: (any CLLocationManagerDelegate)?
     var didRequestAuthorization = false
+    var locations: [CLLocation] = []
     
     func requestWhenInUseAuthorization() {
         didRequestAuthorization = true
+        
+        Task {
+            await MainActor.run {
+                self.authorizationStatus = .authorizedWhenInUse
+                self.delegate?.locationManagerDidChangeAuthorization?(CLLocationManager())
+            }
+        }
     }
     
     func requestLocation() {
-        <#code#>
-    }
-    
-    func stopMonitoringVisits() {
-        <#code#>
+        Task {
+            await MainActor.run {
+                let newLocation = CLLocation(latitude: 25, longitude: 52)
+                locations.last != newLocation ? locations.append(newLocation) : ()
+                delegate?.locationManager?(CLLocationManager(), didUpdateLocations: locations)
+            }
+        }
     }
 }
 
 class LocationWorkerTests: XCTestCase {
     let mockManager = MockLocationManager()
+    var cancellables: Set<AnyCancellable> = []
     
     // MARK: Subject under test
     var sut: LocationWorker!
@@ -52,7 +64,7 @@ class LocationWorkerTests: XCTestCase {
     // MARK: Test setup
     
     func setupLocationWorker() {
-        sut = LocationWorker()
+        sut = LocationWorker(locationManager: mockManager)
     }
     
     // MARK: Tests
@@ -63,37 +75,85 @@ class LocationWorkerTests: XCTestCase {
         mockManager.authorizationStatus = .notDetermined
         
         // When
-        sut.checkOrRequestLocationPermission { _ in }
+        let _ = sut.getCurrentLocation()
         
         // Then
-        XCTAssertTrue(mockManager.didRequestAuthorization == true)
+        XCTAssertTrue(mockManager.didRequestAuthorization)
     }
     
-    func testWorkerRequestsAuthorizationWhenDenied() {
+    func testWorkerDoesntRequestsAuthorizationWhenDenied_AndDoesntPermit() {
         // Given
         sut = LocationWorker(locationManager: mockManager)
         mockManager.authorizationStatus = .denied
         mockManager.didRequestAuthorization = false
-        var isPermitted: Bool!
+        let expectation = expectation(
+            description: "The request for authorization should not happen and the permission should not be changed"
+        )
         
         // When
-        sut.checkOrRequestLocationPermission { isPermitted = $0 }
+        sut.getCurrentLocation()
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    guard let self else {
+                        XCTFail("Self was not available")
+                        return
+                    }
+                    
+                    // Then
+                    switch completion {
+                    case .finished:
+                        XCTFail("The request for authorization should not have finished, because the permission was denied in the first place")
+                    case .failure(let error):
+                        switch error {
+                        case .permissionDenied:
+                            XCTAssertEqual(mockManager.didRequestAuthorization, false)
+                            expectation.fulfill()
+                        default:
+                            XCTFail(
+                                "Something went wrong but the permission wasn't denied"
+                            )
+                        }
+                    }
+                },
+                receiveValue: { _ in }
+            )
+            .store(in: &cancellables)
         
-        // Then
-        XCTAssertEqual(isPermitted, false)
+        wait(for: [expectation])
     }
     
-    func testWorkerRequestsAuthorizationWhenAuthorized() {
+    func testWorkerDoesntRequestAuthorizationWhenAuthorized() {
         // Given
         sut = LocationWorker(locationManager: mockManager)
         mockManager.authorizationStatus = .authorizedWhenInUse
-        mockManager.didRequestAuthorization = false
-        var isPermitted: Bool!
+        let expectation = expectation(
+            description: "The request for authorization should not happen"
+        )
         
         // When
-        sut.checkOrRequestLocationPermission { isPermitted = $0 }
+        sut.getCurrentLocation()
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    guard let self else {
+                        XCTFail("Self was not available")
+                        return
+                    }
+                    
+                    // Then
+                    switch completion {
+                    case .finished:
+                        XCTAssertEqual(mockManager.didRequestAuthorization, false)
+                        expectation.fulfill()
+                    case .failure(let error):
+                        XCTFail(
+                            "Something went wrong: \(error)"
+                        )
+                    }
+                },
+                receiveValue: { _ in }
+            )
+            .store(in: &cancellables)
         
-        // Then
-        XCTAssertTrue(isPermitted)
+        wait(for: [expectation])
     }
 }
