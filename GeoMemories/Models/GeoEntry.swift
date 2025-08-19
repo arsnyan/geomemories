@@ -25,5 +25,5 @@ class GeoEntry: CoreStoreObject {
     var longitude: Double = 0.0
     
     @Field.Relationship("media_entries", inverse: \MediaEntry.$linkedGeoEntry)
-    var imageIds: Set<MediaEntry>
+    var mediaIds: Set<MediaEntry>
 }
