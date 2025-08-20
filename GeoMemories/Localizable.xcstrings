@@ -2,16 +2,68 @@
   "sourceLanguage" : "en",
   "strings" : {
     "coreStoreErrorMessage" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong while working with the database:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так в процессе работы с БД:"
+          }
+        }
+      }
     },
     "coreStoreErrorTitle" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CoreStore Error"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка в CoreStore"
+          }
+        }
+      }
     },
     "dataStackNotAvailableMessage" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DataStack from CoreStore was not initialized:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DataStack из CoreStore не был инициализирован:"
+          }
+        }
+      }
     },
     "dataStackNotAvailableTitle" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DataStack Not Available"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DataStack недоступен"
+          }
+        }
+      }
     },
     "error" : {
       "localizations" : {
@@ -110,7 +162,20 @@
       }
     },
     "retry" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторить"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
