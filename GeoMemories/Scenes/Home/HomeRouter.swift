@@ -12,47 +12,43 @@
 
 import UIKit
 
-@objc protocol HomeRoutingLogic {
-    //func routeToSomewhere(segue: UIStoryboardSegue?)
+protocol HomeRoutingLogic {
+    func routeToCreateEditEntry(geoEntry: GeoEntry?)
 }
 
 protocol HomeDataPassing {
     var dataStore: HomeDataStore? { get }
 }
 
+@MainActor
 class HomeRouter: NSObject, HomeRoutingLogic, HomeDataPassing {
-    
     weak var viewController: HomeViewController?
     var dataStore: HomeDataStore?
     
-    // MARK: Routing
-    /*
-    func routeToSomewhere(segue: UIStoryboardSegue?) {
-        if let segue = segue {
-            let destinationVC = segue.destination as! SomewhereViewController
-            var destinationDS = destinationVC.router!.dataStore!
-            passDataToSomewhere(source: dataStore!, destination: &destinationDS)
-        } else {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let destinationVC = storyboard.instantiateViewController(withIdentifier: "SomewhereViewController") as! SomewhereViewController
-            var destinationDS = destinationVC.router!.dataStore!
-            passDataToSomewhere(source: dataStore!, destination: &destinationDS)
-            navigateToSomewhere(source: viewController!, destination: destinationVC)
-        }
+    func routeToCreateEditEntry(geoEntry: GeoEntry?) {
+        let destinationVC = CreateEditEntryViewController()
+        
+        CreateEditEntryConfigurator.shared.configure(with: destinationVC)
+        
+        var destinationDS = destinationVC.router!.dataStore!
+        
+        passDataToCreateEditEntry(source: dataStore!, destination: &destinationDS, entry: geoEntry)
+        
+        navigateToCreateEditEntry(source: viewController!, destination: destinationVC)
     }
-    */
     
-    // MARK: Navigation
-    /*
-    func navigateToSomewhere(source: HomeViewController, destination: SomewhereViewController) {
-        source.show(destination, sender: nil)
+    private func passDataToCreateEditEntry(
+        source: HomeDataStore,
+        destination: inout CreateEditEntryDataStore,
+        entry: GeoEntry?
+    ) {
+        destination.entry = entry
     }
-    */
     
-    // MARK: Passing data
-    /*
-    func passDataToSomewhere(source: HomeDataStore, destination: inout SomewhereDataStore) {
-        destination.name = source.name
+    func navigateToCreateEditEntry(
+        source: HomeViewController,
+        destination: CreateEditEntryViewController
+    ) {
+        source.navigationController?.present(destination, animated: true)
     }
-    */
 }

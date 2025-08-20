@@ -35,6 +35,13 @@
 		2E245D0E2E53A43D0085B958 /* HomeInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245D072E53A43D0085B958 /* HomeInteractorTests.swift */; };
 		2E713D472E55CCC8002087EB /* MemoryAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D462E55CCC8002087EB /* MemoryAnnotation.swift */; };
 		2E713D492E55CD2B002087EB /* MemoryAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */; };
+		2E713D512E55F6FB002087EB /* CreateEditEntryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4D2E55F6FB002087EB /* CreateEditEntryPresenter.swift */; };
+		2E713D522E55F6FB002087EB /* CreateEditEntryRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4E2E55F6FB002087EB /* CreateEditEntryRouter.swift */; };
+		2E713D532E55F6FB002087EB /* CreateEditEntryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4C2E55F6FB002087EB /* CreateEditEntryModels.swift */; };
+		2E713D542E55F6FB002087EB /* CreateEditEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4F2E55F6FB002087EB /* CreateEditEntryViewController.swift */; };
+		2E713D552E55F6FB002087EB /* CreateEditEntryWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D502E55F6FB002087EB /* CreateEditEntryWorker.swift */; };
+		2E713D562E55F6FB002087EB /* CreateEditEntryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */; };
+		2E713D582E560B52002087EB /* CreateEditEntryConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D572E560B52002087EB /* CreateEditEntryConfigurator.swift */; };
 		2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C9682E54E82A00320E27 /* StorageService.swift */; };
 		2E96C96C2E54FF6200320E27 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */; };
 		2EDB163F2E53CC330002C812 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */; };
@@ -88,6 +95,13 @@
 		2E245D0A2E53A43D0085B958 /* HomeWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWorkerTests.swift; sourceTree = "<group>"; };
 		2E713D462E55CCC8002087EB /* MemoryAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryAnnotation.swift; sourceTree = "<group>"; };
 		2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryAnnotationView.swift; sourceTree = "<group>"; };
+		2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryInteractor.swift; sourceTree = "<group>"; };
+		2E713D4C2E55F6FB002087EB /* CreateEditEntryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryModels.swift; sourceTree = "<group>"; };
+		2E713D4D2E55F6FB002087EB /* CreateEditEntryPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryPresenter.swift; sourceTree = "<group>"; };
+		2E713D4E2E55F6FB002087EB /* CreateEditEntryRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryRouter.swift; sourceTree = "<group>"; };
+		2E713D4F2E55F6FB002087EB /* CreateEditEntryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryViewController.swift; sourceTree = "<group>"; };
+		2E713D502E55F6FB002087EB /* CreateEditEntryWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryWorker.swift; sourceTree = "<group>"; };
+		2E713D572E560B52002087EB /* CreateEditEntryConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryConfigurator.swift; sourceTree = "<group>"; };
 		2E96C9682E54E82A00320E27 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
 		2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -216,6 +230,7 @@
 		2E245CF22E539A490085B958 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				2E713D4A2E55F6E6002087EB /* CreateEditEntry */,
 				2E245CF32E539A510085B958 /* Home */,
 			);
 			path = Scenes;
@@ -262,6 +277,20 @@
 				2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */,
 			);
 			path = MemoryAnnotation;
+			sourceTree = "<group>";
+		};
+		2E713D4A2E55F6E6002087EB /* CreateEditEntry */ = {
+			isa = PBXGroup;
+			children = (
+				2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */,
+				2E713D4C2E55F6FB002087EB /* CreateEditEntryModels.swift */,
+				2E713D4D2E55F6FB002087EB /* CreateEditEntryPresenter.swift */,
+				2E713D4E2E55F6FB002087EB /* CreateEditEntryRouter.swift */,
+				2E713D4F2E55F6FB002087EB /* CreateEditEntryViewController.swift */,
+				2E713D502E55F6FB002087EB /* CreateEditEntryWorker.swift */,
+				2E713D572E560B52002087EB /* CreateEditEntryConfigurator.swift */,
+			);
+			path = CreateEditEntry;
 			sourceTree = "<group>";
 		};
 		2E96C9672E54E81600320E27 /* Services */ = {
@@ -431,9 +460,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E245CD02E5338CF0085B958 /* LocationWorker.swift in Sources */,
+				2E713D582E560B52002087EB /* CreateEditEntryConfigurator.swift in Sources */,
 				2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */,
 				2E245CFA2E539A630085B958 /* HomeInteractor.swift in Sources */,
 				2E713D472E55CCC8002087EB /* MemoryAnnotation.swift in Sources */,
+				2E713D512E55F6FB002087EB /* CreateEditEntryPresenter.swift in Sources */,
+				2E713D522E55F6FB002087EB /* CreateEditEntryRouter.swift in Sources */,
+				2E713D532E55F6FB002087EB /* CreateEditEntryModels.swift in Sources */,
+				2E713D542E55F6FB002087EB /* CreateEditEntryViewController.swift in Sources */,
+				2E713D552E55F6FB002087EB /* CreateEditEntryWorker.swift in Sources */,
+				2E713D562E55F6FB002087EB /* CreateEditEntryInteractor.swift in Sources */,
 				2E245CFB2E539A630085B958 /* HomeRouter.swift in Sources */,
 				2E245CFC2E539A630085B958 /* HomeViewController.swift in Sources */,
 				2E245CFD2E539A630085B958 /* HomeModels.swift in Sources */,
