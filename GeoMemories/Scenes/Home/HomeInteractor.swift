@@ -12,10 +12,11 @@
 
 import Foundation
 import Combine
+import CoreStore
 
 protocol HomeBusinessLogic {
-    func provideCurrentLocation(request: Home.SelectCurrentLocation.Request)
-    func provideMapEntries(request: Home.ShowMapEntries.Request)
+    func provideCurrentLocation()
+    func provideMapEntries()
     func addMapEntry(request: Home.AddEntry.Request)
     func provideEntryCallout(request: Home.ShowAnnotationPopover.Request)
 }
@@ -35,7 +36,7 @@ class HomeInteractor: HomeBusinessLogic, HomeDataStore {
         locationCancellable?.cancel()
     }
     
-    func provideCurrentLocation(request: Home.SelectCurrentLocation.Request) {
+    func provideCurrentLocation() {
         presenter?.presentCurrentLocation(response: .loading)
         
         locationCancellable = worker.getCurrentLocation()
@@ -58,8 +59,8 @@ class HomeInteractor: HomeBusinessLogic, HomeDataStore {
             )
     }
     
-    func provideMapEntries(request: Home.ShowMapEntries.Request) {
-        
+    func provideMapEntries() {
+        #warning("Implement next")
     }
     
     func addMapEntry(request: Home.AddEntry.Request) {

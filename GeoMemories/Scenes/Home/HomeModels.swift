@@ -11,54 +11,34 @@
 //
 
 import CoreLocation
+import MapKit
 
 // swiftlint:disable nesting
 enum Home {
     // MARK: Use cases
     enum ShowMapEntries {
-        struct Request {
-            
-        }
-        
         struct Response {
             
         }
         
-        struct ViewModel {
-            
+        enum ViewModel {
+            case loading
+            case sucess(annotations: [MemoryAnnotation])
+            case failure(alertTitle: String, alertMessage: String)
         }
     }
     
     enum SelectCurrentLocation {
-        struct Request {
-            
-        }
-        
         enum Response {
             case loading
             case success(location: CLLocation)
             case failure(error: LocationError)
         }
         
-        struct ViewModel {
-            let locationCenter: CLLocationCoordinate2D
-            let areaRadius: CLLocationDistance
-        }
-    }
-    
-    enum ShowAlert {
-        struct Request {
-            
-        }
-        
-        struct Response {
-            let titleKey: String
-            let messageKey: String
-        }
-        
-        struct ViewModel {
-            let title: String
-            let message: String
+        enum ViewModel {
+            case loading
+            case success(region: MKCoordinateRegion)
+            case failure(alertTitle: String, alertMessage: String)
         }
     }
     

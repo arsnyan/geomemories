@@ -11,6 +11,7 @@
 //
 
 import CoreLocation
+import MapKit
 
 protocol HomePresentationLogic {
     func presentCurrentLocation(response: Home.SelectCurrentLocation.Response)
@@ -22,14 +23,17 @@ class HomePresenter: HomePresentationLogic {
     func presentCurrentLocation(response: Home.SelectCurrentLocation.Response) {
         switch response {
         case .loading:
-            viewController?.displayLoadingIndicator()
+            viewController?.displayCurrentLocation(viewModel: .loading)
         case .success(let location):
-            let viewModel = Home.SelectCurrentLocation.ViewModel(
-                locationCenter: location.coordinate,
-                areaRadius: 1000
+            viewController?.displayCurrentLocation(
+                viewModel: .success(
+                    region: MKCoordinateRegion(
+                        center: location.coordinate,
+                        latitudinalMeters: 500,
+                        longitudinalMeters: 500
+                    )
+                )
             )
-            viewController?.displayCurrentLocation(viewModel: viewModel)
-            viewController?.stopLoadingIndicator()
         case .failure(let error):
             let title: String
             let message: String
@@ -42,9 +46,12 @@ class HomePresenter: HomePresentationLogic {
                 message = String(localized: "noLocalizedErrorMessage") + "\n\(error.localizedDescription)"
             }
             
-            let viewModel = Home.ShowAlert.ViewModel(title: title, message: message)
-            viewController?.displayAlert(viewModel: viewModel)
-            viewController?.stopLoadingIndicator()
+            viewController?.displayCurrentLocation(
+                viewModel: .failure(
+                    alertTitle: title,
+                    alertMessage: message
+                )
+            )
         }
     }
 }

@@ -15,13 +15,14 @@ import SnapKit
 import MapKit
 
 protocol HomeDisplayLogic: AnyObject {
-    func displayAlert(viewModel: Home.ShowAlert.ViewModel)
     func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel)
-    func displayLoadingIndicator()
-    func stopLoadingIndicator()
+    #warning("Make annotations, popups for annotations, add new entry functionality and show details functionality")
+    func displayMapEntries(viewModel: Home.ShowMapEntries.ViewModel)
 }
 
 class HomeViewController: UIViewController {
+    let defaultPinIdentifier = "DefaultPin"
+    
     var interactor: HomeBusinessLogic?
     var router: (NSObjectProtocol & HomeRoutingLogic & HomeDataPassing)?
     
@@ -41,45 +42,105 @@ class HomeViewController: UIViewController {
     // MARK: View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        toolbarItems = [
-            .flexibleSpace(),
-            UIBarButtonItem(
-                image: UIImage(systemName: "location.fill"),
-                style: .plain,
-                target: self,
-                action: #selector(selectCurrentLocation)
+        setupUI()
+    }
+    
+    // MARK: Routing
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if let scene = segue.identifier {
+//            let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
+//            if let router = router, router.responds(to: selector) {
+//                router.perform(selector, with: segue)
+//            }
+//        }
+//    }
+}
+
+// MARK: - MKMapViewDelegate
+extension HomeViewController: MKMapViewDelegate {
+    func mapView(
+        _ mapView: MKMapView,
+        viewFor annotation: any MKAnnotation
+    ) -> MKAnnotationView? {
+        if let memoryAnnotation = annotation as? MemoryAnnotation {
+            let identifier = MemoryAnnotationView.reuseIdentifier
+            var view = mapView.dequeueReusableAnnotationView(
+                withIdentifier: identifier
             )
-        ]
+            if view == nil {
+                view = MemoryAnnotationView(
+                    annotation: annotation,
+                    reuseIdentifier: identifier
+                )
+            } else {
+                view?.annotation = memoryAnnotation
+            }
+            return view
+        }
+        
+        return nil
+    }
+}
+
+// MARK: - UI Setup
+private extension HomeViewController {
+    func setupToolbar() {
+        let locationPinItem = UIBarButtonItem(
+            image: UIImage(systemName: "location.fill"),
+            style: .plain,
+            target: self,
+            action: #selector(locationPinToolbarButtonTapped)
+        )
+        
+        let addItem = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(addBarButtonTapped)
+        )
+        
+        if #available(iOS 26.0, *) {
+            toolbarItems = [.flexibleSpace(), addItem, .fixedSpace(), locationPinItem]
+        } else {
+            toolbarItems = [.flexibleSpace(), addItem, locationPinItem]
+        }
         navigationController?.setToolbarHidden(false, animated: false)
+    }
+    
+    func setupUI() {
+        defer { setupConstraints() }
+        setupToolbar()
         
         view.addSubview(mapView)
+        interactor?.provideMapEntries()
+    }
+    
+    func setupConstraints() {
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
-    
-    // MARK: Routing
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let scene = segue.identifier {
-            let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
-            if let router = router, router.responds(to: selector) {
-                router.perform(selector, with: segue)
-            }
-        }
+}
+
+// MARK: - Private selector actions
+@objc private extension HomeViewController {
+    func locationPinToolbarButtonTapped() {
+        interactor?.provideCurrentLocation()
     }
     
-    @objc private func selectCurrentLocation() {
-        interactor?.provideCurrentLocation(request: Home.SelectCurrentLocation.Request())
+    func addBarButtonTapped() {
+        
     }
 }
 
-extension HomeViewController: HomeDisplayLogic {
-    func displayAlert(viewModel: Home.ShowAlert.ViewModel) {
+// MARK: - Private methods
+private extension HomeViewController {
+    func showAlert(with title: String, message: String, performing actions: [UIAlertAction] = []) {
         let alertController = UIAlertController(
-            title: viewModel.title,
-            message: viewModel.message,
+            title: title,
+            message: message,
             preferredStyle: .alert
         )
+        actions.forEach { alertController.addAction($0) }
         alertController.addAction(
             UIAlertAction(
                 title: String(localized: "ok"),
@@ -88,23 +149,41 @@ extension HomeViewController: HomeDisplayLogic {
         )
         present(alertController, animated: true)
     }
-    
+}
+
+extension HomeViewController: HomeDisplayLogic {
     func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel) {
-        mapView.setRegion(
-            MKCoordinateRegion(
-                center: viewModel.locationCenter,
-                latitudinalMeters: viewModel.areaRadius,
-                longitudinalMeters: viewModel.areaRadius
-            ),
-            animated: true
-        )
+        switch viewModel {
+        case .loading:
+            activityIndicator.startAnimating()
+        case .success(let region):
+            activityIndicator.stopAnimating()
+            mapView.setRegion(region, animated: true)
+        case .failure(let alertTitle, let alertMessage):
+            activityIndicator.stopAnimating()
+            self.showAlert(with: alertTitle, message: alertMessage)
+        }
     }
     
-    func displayLoadingIndicator() {
-        activityIndicator.startAnimating()
-    }
-    
-    func stopLoadingIndicator() {
-        activityIndicator.stopAnimating()
+    func displayMapEntries(viewModel: Home.ShowMapEntries.ViewModel) {
+        switch viewModel {
+        case .loading:
+            activityIndicator.startAnimating()
+        case .sucess(let annotations):
+            activityIndicator.stopAnimating()
+            mapView.addAnnotations(annotations)
+        case .failure(let alertTitle, let alertMessage):
+            activityIndicator.stopAnimating()
+            self.showAlert(
+                with: alertTitle,
+                message: alertMessage,
+                performing: [UIAlertAction(
+                    title: String(localized: "retry"),
+                    style: .default,
+                    handler: { [weak self] _ in
+                        self?.interactor?.provideMapEntries()
+                    })]
+            )
+        }
     }
 }
