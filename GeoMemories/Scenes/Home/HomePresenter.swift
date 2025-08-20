@@ -15,6 +15,7 @@ import MapKit
 
 protocol HomePresentationLogic {
     func presentCurrentLocation(response: Home.SelectCurrentLocation.Response)
+    func presentMapEntries(response: Home.ShowMapEntries.Response)
 }
 
 class HomePresenter: HomePresentationLogic {
@@ -47,6 +48,53 @@ class HomePresenter: HomePresentationLogic {
             }
             
             viewController?.displayCurrentLocation(
+                viewModel: .failure(
+                    alertTitle: title,
+                    alertMessage: message
+                )
+            )
+        }
+    }
+    
+    func presentMapEntries(response: Home.ShowMapEntries.Response) {
+        switch response {
+        case .loading:
+            viewController?.displayMapEntries(viewModel: .loading)
+        case .success(let entries):
+            #warning ("it is 100% incorrect, need to think about retrieving image from local storage")
+            let annotations = entries.map { entry in
+                MemoryAnnotation(
+                    latitude: entry.latitude,
+                    longitude: entry.longitude,
+                    image: UIImage(
+                        named: entry.mediaIds
+                            .first(
+                                where: {
+                                    $0.mediaType == MediaType.image.rawValue
+                                }
+                            )?.mediaPath ?? ""
+                    )
+                )
+            }
+        case .failure(let error):
+            let title: String
+            let message: String
+            
+            switch error {
+            case .noDataStack:
+                title = String(localized: "dataStackNotAvailableTitle")
+                message = String(localized: "dataStackNotAvailableMessage")
+            case .coreStoreError(let error):
+                title = String(localized: "coreStoreErrorTitle")
+                message = String(localized: "coreStoreErrorMessage")
+                    + "\n\(error.localizedDescription)"
+            default:
+                title = String(localized: "genericErrorTitle")
+                message = String(localized: "noLocalizedErrorMessage")
+                    + "\n\(error.localizedDescription)"
+            }
+            
+            viewController?.displayMapEntries(
                 viewModel: .failure(
                     alertTitle: title,
                     alertMessage: message

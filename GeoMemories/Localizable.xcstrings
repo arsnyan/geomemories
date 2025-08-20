@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "coreStoreErrorMessage" : {
+
+    },
+    "coreStoreErrorTitle" : {
+
+    },
+    "dataStackNotAvailableMessage" : {
+
+    },
+    "dataStackNotAvailableTitle" : {
+
+    },
     "error" : {
       "localizations" : {
         "en" : {

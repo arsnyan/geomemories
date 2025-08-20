@@ -17,8 +17,10 @@ import MapKit
 enum Home {
     // MARK: Use cases
     enum ShowMapEntries {
-        struct Response {
-            
+        enum Response {
+            case loading
+            case success(entries: [GeoEntry])
+            case failure(error: StorageServiceError)
         }
         
         enum ViewModel {

@@ -26,20 +26,25 @@ protocol HomeDataStore {
 }
 
 class HomeInteractor: HomeBusinessLogic, HomeDataStore {
+    private var cancellables = Set<AnyCancellable>()
     var entries: [GeoEntry] = []
     var presenter: HomePresentationLogic?
-    let worker: LocationWorker = LocationWorker()
     
-    private var locationCancellable: AnyCancellable?
+    let locationWorker: LocationWorker
+    let storageService: StorageServiceProtocol
     
-    deinit {
-        locationCancellable?.cancel()
+    init(
+        locationWorker: LocationWorker = LocationWorker(),
+        storageService: StorageServiceProtocol = StorageService()
+    ) {
+        self.locationWorker = locationWorker
+        self.storageService = storageService
     }
     
     func provideCurrentLocation() {
         presenter?.presentCurrentLocation(response: .loading)
         
-        locationCancellable = worker.getCurrentLocation()
+        locationWorker.getCurrentLocation()
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
@@ -57,10 +62,27 @@ class HomeInteractor: HomeBusinessLogic, HomeDataStore {
                     self?.presenter?.presentCurrentLocation(response: response)
                 }
             )
+            .store(in: &cancellables)
     }
     
     func provideMapEntries() {
-        #warning("Implement next")
+        presenter?.presentMapEntries(response: .loading)
+        
+        StorageService().getGeoEntries()
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case .failure(let error) = completion {
+                        let response = Home.ShowMapEntries.Response.failure(error: error)
+                        self?.presenter?.presentMapEntries(response: response)
+                    }
+                },
+                receiveValue: { [weak self] entries in
+                    let response = Home.ShowMapEntries.Response.success(entries: entries)
+                    self?.presenter?.presentMapEntries(response: response)
+                }
+            )
+            .store(in: &cancellables)
     }
     
     func addMapEntry(request: Home.AddEntry.Request) {

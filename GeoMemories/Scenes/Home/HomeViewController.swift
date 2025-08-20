@@ -109,7 +109,6 @@ private extension HomeViewController {
     func setupUI() {
         defer { setupConstraints() }
         setupToolbar()
-        
         view.addSubview(mapView)
         interactor?.provideMapEntries()
     }
