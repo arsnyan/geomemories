@@ -16,7 +16,7 @@ import MapKit
 
 protocol HomeDisplayLogic: AnyObject {
     func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel)
-    #warning("Make annotations, popups for annotations, add new entry functionality and show details functionality")
+    // TODO: - Make annotations, popups for annotations, add new entry functionality and show details functionality
     func displayMapEntries(viewModel: Home.ShowMapEntries.ViewModel)
 }
 

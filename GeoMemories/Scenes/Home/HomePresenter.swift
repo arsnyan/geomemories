@@ -61,7 +61,7 @@ class HomePresenter: HomePresentationLogic {
         case .loading:
             viewController?.displayMapEntries(viewModel: .loading)
         case .success(let entries):
-            #warning ("it is 100% incorrect, need to think about retrieving image from local storage")
+            // FIXME: - It is 100% incorrect, need to think about retrieving image from local storage
             let annotations = entries.map { entry in
                 MemoryAnnotation(
                     latitude: entry.latitude,
