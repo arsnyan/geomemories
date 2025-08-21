@@ -8,6 +8,7 @@
 import UIKit
 import CoreStore
 import Combine
+import OSLog
 
 protocol CoreStoreConfiguratorProtocol {
     var dataStack: DataStack! { get }
@@ -19,6 +20,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CoreStoreConfiguratorPr
     private var cancellables = Set<AnyCancellable>()
     
     var window: UIWindow?
+    
+    let logger = Logger(subsystem: "GeoMemories", category: "SceneDelegate")
 
     func scene(
         _ scene: UIScene,
@@ -103,22 +106,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CoreStoreConfiguratorPr
                 receiveCompletion: { [unowned self] completion in
                     switch completion {
                     case .finished:
-                        print("DataStack initialized successfully")
+                        logger.info("DataStack initialized successfully")
                         setupRootViewController()
                     case .failure(let error):
-                        print("Failed to initialized DataStack:", error)
+                        logger.error("Failed to initialized DataStack:\n\(error)")
                         showAlert(error)
                     }
                 },
-                receiveValue: { progress in
+                receiveValue: { [weak self] progress in
                     switch progress {
                     case .migrating(_, let nsProgress):
                         let formattedProgress = round(nsProgress.fractionCompleted * 100)
-                        print("Migration progress: \(formattedProgress) %")
+                        self?.logger.trace("Migration progress: \(formattedProgress) %")
                     case .finished(_, let migrationRequired):
-                        print(
-                            "Migration finished. Required migration: ",
-                            migrationRequired
+                        self?.logger.trace(
+                            "Migration finished. Required migration:\n\(migrationRequired)"
                         )
                     }
                 }
