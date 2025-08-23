@@ -24,8 +24,12 @@ protocol CreateEditEntryPresentationLogic {
 class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
     weak var viewController: CreateEditEntryDisplayLogic?
     
-    func presentNavigationBarTitle(response: CreateEditEntry.ConfigurePurpose.Response) {
-        let title = String(localized: response.isEditMode ? "editingTitle" : "creatingTitle")
+    func presentNavigationBarTitle(
+        response: CreateEditEntry.ConfigurePurpose.Response
+    ) {
+        let editingTitle = String(localized: "editingTitle")
+        let creatingTitle = String(localized: "creatingTitle")
+        let title = response.isEditMode ? editingTitle : creatingTitle
         let viewModel = CreateEditEntry.ConfigurePurpose.ViewModel(title: title)
         viewController?.configureNavigationBarTitle(viewModel: viewModel)
     }

@@ -12,7 +12,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Что-то пошло не так в процессе работы с БД:"
+            "value" : "Что-то пошло не так в процессе работы с базой данных:"
           }
         }
       }
@@ -29,6 +29,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка в CoreStore"
+          }
+        }
+      }
+    },
+    "creatingTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create an entry"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать"
           }
         }
       }
@@ -65,6 +81,22 @@
         }
       }
     },
+    "editingTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the entry"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить"
+          }
+        }
+      }
+    },
     "error" : {
       "localizations" : {
         "en" : {
@@ -82,7 +114,20 @@
       }
     },
     "failedToFindLocationsMessage" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t find a location for the query:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По вашему запросу не удалось ничего найти:"
+          }
+        }
+      }
     },
     "genericErrorTitle" : {
       "localizations" : {
@@ -101,10 +146,36 @@
       }
     },
     "getCurrentLocationButtonActionTitle" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get current location for the geo entry location search field."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указать текущее местоположение в поле поиска локаций."
+          }
+        }
+      }
     },
     "locationSearchFieldPlaceholder" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search a Location…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите адрес для поиска"
+          }
+        }
+      }
     },
     "locationServicesNotAuthorizedMessage" : {
       "localizations" : {
@@ -187,7 +258,20 @@
       }
     },
     "unknownErrorMessage" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undefined error. Please contact the developer with exact steps you took to replicate this error"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка без описания. Пожалуйста, напишите разработчику, какие шаги вы предприняли перед появлением этой ошибки"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
