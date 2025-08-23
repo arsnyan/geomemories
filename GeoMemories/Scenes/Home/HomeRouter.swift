@@ -49,6 +49,15 @@ class HomeRouter: NSObject, HomeRoutingLogic, HomeDataPassing {
         source: HomeViewController,
         destination: CreateEditEntryViewController
     ) {
-        source.navigationController?.present(destination, animated: true)
+        let navigationController = UINavigationController(rootViewController: destination)
+        if let sheet = navigationController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.prefersGrabberVisible = true
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = true
+            sheet.prefersEdgeAttachedInCompactHeight = true
+            sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
+        }
+        source.navigationController?.present(navigationController, animated: true)
     }
 }

@@ -12,6 +12,8 @@
 
 import CoreLocation
 import Combine
+import MapKit
+import OSLog
 
 protocol LocationManagerProtocol: AnyObject {
     var authorizationStatus: CLAuthorizationStatus { get }
@@ -23,35 +25,57 @@ protocol LocationManagerProtocol: AnyObject {
 
 extension CLLocationManager: LocationManagerProtocol {}
 
+protocol MKLocalSearchCompleterProtocol: AnyObject {
+    var queryFragment: String { get set }
+    var resultTypes: MKLocalSearchCompleter.ResultType { get set }
+    var region: MKCoordinateRegion { get set }
+    var delegate: MKLocalSearchCompleterDelegate? { get set }
+}
+
+extension MKLocalSearchCompleter: MKLocalSearchCompleterProtocol {}
+
 enum LocationError: LocalizedError {
     case permissionDenied
     case failedToFetchLocation(Error)
+    case failedToFindLocations(Error)
     case unknown
     
     var errorDescription: String? {
         switch self {
         case .permissionDenied:
-            return "Permission denied to access location"
+            "Permission denied to access location"
         case .failedToFetchLocation(let error):
-            return "Failed to fetch location: \(error.localizedDescription)"
+            "Failed to fetch location: \(error.localizedDescription)"
+        case .failedToFindLocations(let error):
+            "Failed to find locations: \(error.localizedDescription)"
         case .unknown:
-            return "Unknown error"
+            "Unknown error"
         }
     }
 }
 
-class LocationWorker: NSObject, CLLocationManagerDelegate {
+class LocationWorker: NSObject {
+    private let logger = Logger(subsystem: "GeoMemories", category: "LocationWorker")
+    
     private let locationManager: LocationManagerProtocol
     private let locationSubject = PassthroughSubject<CLLocation, Error>()
+    private let searchCompleter: MKLocalSearchCompleterProtocol
+    private let completionSubject = PassthroughSubject<[MKLocalSearchCompletion], Error>()
     
     private var lastLocation: CLLocation?
     private var lastLocationTimestamp: Date?
     private let cacheValidityDuration: TimeInterval = 5 * 60
     
-    init(locationManager: LocationManagerProtocol = CLLocationManager()) {
+    init(
+        locationManager: LocationManagerProtocol = CLLocationManager(),
+        searchCompleter: MKLocalSearchCompleterProtocol = MKLocalSearchCompleter()
+    ) {
         self.locationManager = locationManager
+        self.searchCompleter = searchCompleter
         super.init()
         self.locationManager.delegate = self
+        self.searchCompleter.delegate = self
+//        self.searchCompleter.resultTypes = .
     }
     
     func getCurrentLocation() -> AnyPublisher<CLLocation, LocationError> {
@@ -93,6 +117,40 @@ class LocationWorker: NSObject, CLLocationManagerDelegate {
         .eraseToAnyPublisher()
     }
     
+    func findLocations(
+        with query: String
+    ) -> AnyPublisher<[MKMapItem], LocationError> {
+        searchCompleter.queryFragment = query
+        return completionSubject
+            .mapError({ LocationError.failedToFindLocations($0) })
+            .flatMap { completions -> AnyPublisher<[MKMapItem], LocationError> in
+                let searches = completions.map { completion in
+                    Future<MKMapItem, LocationError> { promise in
+                        let request = MKLocalSearch.Request(completion: completion)
+                        
+                        MKLocalSearch(request: request).start { response, error in
+                            if let error {
+                                promise(
+                                    .failure(.failedToFindLocations(error))
+                                )
+                            } else if let item = response?.mapItems.first {
+                                promise(.success(item))
+                            } else {
+                                promise(.failure(.unknown))
+                            }
+                        }
+                    }
+                }
+                
+                return Publishers.MergeMany(searches)
+                    .collect()
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
+}
+
+extension LocationWorker: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .restricted, .denied:
@@ -113,10 +171,28 @@ class LocationWorker: NSObject, CLLocationManagerDelegate {
             
             locationSubject.send(location)
             locationSubject.send(completion: .finished)
+            
+            let region = MKCoordinateRegion(
+                center: location.coordinate,
+                latitudinalMeters: 100000,
+                longitudinalMeters: 100000
+            )
+            self.searchCompleter.region = region
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         locationSubject.send(completion: .failure(error))
+    }
+}
+
+extension LocationWorker: MKLocalSearchCompleterDelegate {
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        completionSubject.send(completer.results)
+    }
+    
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: any Error) {
+        completionSubject.send(completion: .failure(error))
+        logger.error("\(error)")
     }
 }

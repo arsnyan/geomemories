@@ -11,9 +11,26 @@
 //
 
 import Foundation
+import CoreLocation
+import Combine
+import MapKit
+import OSLog
+
+enum CreateEditEntryError: LocalizedError {
+    case failedToTransformCache
+    
+    var errorDescription: String {
+        switch self {
+        case .failedToTransformCache:
+            "The cached search results were not transformed correctly, thus they're not saved correctly too"
+        }
+    }
+}
 
 protocol CreateEditEntryBusinessLogic {
     func provideNavigationBarTitle()
+    func provideLocationSearchResults(request: CreateEditEntry.SearchLocation.Request)
+    func selectLocation(request: CreateEditEntry.ChooseLocation.Request)
 }
 
 protocol CreateEditEntryDataStore {
@@ -21,13 +38,105 @@ protocol CreateEditEntryDataStore {
 }
 
 class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDataStore {
+    private let logger = Logger(subsystem: "GeoMemories", category: "CreateEditEntryInteractor")
+    private var cancellables = Set<AnyCancellable>()
+    
     var entry: GeoEntry?
     
     var presenter: CreateEditEntryPresentationLogic?
     var worker: CreateEditEntryWorker?
+    var locationWorker: LocationWorker?
+    
+    private let cachedSearchResults = NSCache<NSString, NSArray>()
     
     func provideNavigationBarTitle() {
-        let response = CreateEditEntry.ConfigurePurpose.Response(isEditMode: entry == nil)
+        let response = CreateEditEntry.ConfigurePurpose.Response(isEditMode: entry != nil)
         presenter?.presentNavigationBarTitle(response: response)
+    }
+    
+    func provideLocationSearchResults(request: CreateEditEntry.SearchLocation.Request) {
+        switch request {
+        case .cancelled:
+            presenter?.presentLocationSearchResults(response: .userCancelled)
+        case .clear:
+            presenter?.presentLocationSearchResults(response: .success(results: []))
+        case .search(let query):
+            if let genericCachedResults = cachedSearchResults.object(
+                forKey: NSString(string: query)
+            ) {
+                guard let cachedResults = genericCachedResults
+                        as? [MKMapItem] else {
+                    presenter?.presentLocationSearchResults(
+                        response: .failure(
+                            error: CreateEditEntryError.failedToTransformCache
+                        )
+                    )
+                    logger.trace(
+                        "Failed to transform cached results for query: \(query)"
+                    )
+                    return
+                }
+                
+                logger.trace("Found a cached result for query: \(query)")
+                
+                presenter?.presentLocationSearchResults(
+                    response: .success(results: cachedResults)
+                )
+                return
+            }
+            
+            logger.trace("No cached result for query: \(query). Requesting from MapKit")
+            
+            locationWorker?.findLocations(with: query)
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { [weak self] completion in
+                        if case .failure(let error) = completion {
+                            self?.presenter?.presentLocationSearchResults(
+                                response: .failure(error: error)
+                            )
+                        }
+                    },
+                    receiveValue: { [weak self] mapItems in
+                        self?.cachedSearchResults.setObject(
+                            mapItems as NSArray,
+                            forKey: NSString(string: query)
+                        )
+                        
+                        self?.presenter?.presentLocationSearchResults(
+                            response: .success(results: mapItems)
+                        )
+                    }
+                )
+                .store(in: &cancellables)
+        }
+    }
+    
+    func selectLocation(request: CreateEditEntry.ChooseLocation.Request) {
+        switch request {
+        case .abort:
+            presenter?.presentSelectedLocation(response: .empty)
+        case .manual(let row):
+            presenter?.presentSelectedLocation(
+                response: .successWithSelectedLocation(mapItem: row.mapItem)
+            )
+        case .current:
+            locationWorker?.getCurrentLocation()
+                .sink(
+                    receiveCompletion: { [weak self] completion in
+                        if case let .failure(error) = completion {
+                            self?.presenter?.presentSelectedLocation(
+                                response: .failure(error: error)
+                            )
+                        }
+                    },
+                    receiveValue: { [weak self] location in
+                        self?.presenter?.presentSelectedLocation(
+                            response: .successWithCurrentLocation(location: location)
+                        )
+                    }
+                )
+                .store(in: &cancellables)
+        }
     }
 }

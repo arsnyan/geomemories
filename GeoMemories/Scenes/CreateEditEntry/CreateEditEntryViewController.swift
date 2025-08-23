@@ -11,32 +11,339 @@
 //
 
 import UIKit
+import SnapKit
+import MapKit
+import Combine
 
+// MARK: - View Protocol
 protocol CreateEditEntryDisplayLogic: AnyObject {
     func configureNavigationBarTitle(viewModel: CreateEditEntry.ConfigurePurpose.ViewModel)
-//    func displaySomething(viewModel: CreateEditEntry.Something.ViewModel)
+    func displayLocationSearchResults(viewModel: CreateEditEntry.SearchLocation.ViewModel)
+    func displaySelectedLocation(viewModel: CreateEditEntry.ChooseLocation.ViewModel)
+    func detintCurrentLocationButton()
 }
 
+// MARK: - View Controller
 class CreateEditEntryViewController: UIViewController {
     var interactor: CreateEditEntryBusinessLogic?
     var router: (NSObjectProtocol & CreateEditEntryRoutingLogic & CreateEditEntryDataPassing)?
+    
+    private var searchTimer: Timer?
+    private var didSelectLocationProgrammatically = false
+    private var locationRows: [LocationCellViewModelProtocol] = []
+    
+    // MARK: - UI Components
+    
+    private let getCurrentLocationButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "location.fill"), for: .normal)
+        button.tintColor = .systemGray
+        let action = UIAction(
+            discoverabilityTitle: String(
+                localized: "getCurrentLocationButtonActionTitle"
+            ),
+            handler: { _ in
+                button.tintColor = .systemBlue
+            }
+        )
+        button.addAction(action, for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var locationSearchField: RoundedCornersTextField = {
+        let textField = RoundedCornersTextField()
+        textField.placeholder = String(localized: "locationSearchFieldPlaceholder")
+        textField.backgroundColor = .black.withAlphaComponent(0.1)
+        textField.paddingValue = 16
+        textField.layer.cornerRadius = 24
+        textField.rightView = getCurrentLocationButton
+        textField.rightViewMode = .unlessEditing
+        textField.clearButtonMode = .whileEditing
+        textField.delegate = self
+        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        return textField
+    }()
+    
+    private lazy var locationSearchContrainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black.withAlphaComponent(0.1)
+        view.layer.cornerRadius = 24
+        view.clipsToBounds = true
+        view.layer.masksToBounds = true
+        view.isHidden = true
+        return view
+    }()
+    
+    private lazy var searchResultsTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
+        tableView.showsVerticalScrollIndicator = false
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(
+            LocationCellView.self,
+            forCellReuseIdentifier: LocationCellView.reuseIdentifier
+        )
+        return tableView
+    }()
+    
+    private lazy var searchLoadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.center = searchResultsTableView.center
+        return indicator
+    }()
     
     // MARK: View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        view.endEditing(true)
+    }
+}
+
+// MARK: - Animation Methods
+private extension CreateEditEntryViewController {
+    func showSearchContainer(with height: CGFloat) {
+        locationSearchContrainer.isHidden = false
+        
+        locationSearchContrainer.snp.updateConstraints { make in
+            make.height.equalTo(height)
+        }
+        
+        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    func hideSearchContainer() {
+        locationSearchContrainer.isHidden = true
+        
+        locationSearchContrainer.snp.updateConstraints { make in
+            make.height.equalTo(0)
+        }
+        
+        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0) {
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            self.locationSearchContrainer.isHidden = true
+        }
+    }
 }
 
 // MARK: - UI Setup
 private extension CreateEditEntryViewController {
-    private func setupUI() {
+    func setupUI() {
         interactor?.provideNavigationBarTitle()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .cancel,
+            target: self,
+            action: #selector(dismissSheet)
+        )
+        
+        getCurrentLocationButton.addTarget(
+            self,
+            action: #selector(currentLocationButtonDidTap),
+            for: .touchUpInside
+        )
+        
+        setupConstraints()
+    }
+    
+    func setupConstraints() {
+        view.addSubview(locationSearchField)
+        locationSearchContrainer.addSubview(searchResultsTableView)
+        view.addSubview(locationSearchContrainer)
+        view.bringSubviewToFront(locationSearchField)
+        
+        locationSearchField.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-16)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.height.equalTo(48)
+        }
+        
+        locationSearchContrainer.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(locationSearchField)
+            make.top.equalTo(locationSearchField.snp.bottom).offset(-48)
+            make.height.equalTo(0)
+        }
+        
+        searchResultsTableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(
+                UIEdgeInsets(
+                    top: 48,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                )
+            )
+        }
+    }
+    
+    func showAlert(with title: String, message: String, performing actions: [UIAlertAction] = []) {
+        let alertController = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        actions.forEach { alertController.addAction($0) }
+        alertController.addAction(
+            UIAlertAction(
+                title: String(localized: "ok"),
+                style: .default
+            )
+        )
+        present(alertController, animated: true)
     }
 }
 
+// MARK: - Private selector methods
+@objc private extension CreateEditEntryViewController {
+    func dismissSheet() {
+        dismiss(animated: true)
+    }
+    
+    func textFieldDidChange(_ textField: UITextField) {
+        searchTimer?.invalidate()
+        
+        guard let text = textField.text,
+              !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            getCurrentLocationButton.tintColor = .systemGray
+            interactor?.provideLocationSearchResults(request: .clear)
+            return
+        }
+        
+        #if DEBUG
+        searchTimer = Timer.scheduledTimer(
+            withTimeInterval: 2,
+            repeats: false,
+            block: { [weak self] _ in
+                self?.interactor?.provideLocationSearchResults(request: .search(query: text))
+            }
+        )
+        #else
+        searchTimer = Timer.scheduledTimer(
+            withTimeInterval: 1,
+            repeats: false,
+            block: { [weak self] _ in
+                self?.interactor?.provideLocationSearchResults(request: .search(query: text))
+            }
+        )
+        #endif
+    }
+    
+    func currentLocationButtonDidTap() {
+        interactor?.selectLocation(request: .current)
+    }
+}
+
+// MARK: - UITextFieldDelegate
+extension CreateEditEntryViewController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if let text = textField.text,
+           !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            interactor?.provideLocationSearchResults(request: .search(query: text))
+        }
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            guard !self.didSelectLocationProgrammatically else {
+                self.didSelectLocationProgrammatically = false
+                return
+            }
+            self.interactor?.provideLocationSearchResults(request: .cancelled)
+        }
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        interactor?.provideLocationSearchResults(request: .clear)
+        return true
+    }
+}
+
+// MARK: - UITableViewDataSource
+extension CreateEditEntryViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        locationRows.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cellViewModel = locationRows[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: LocationCellView.reuseIdentifier,
+            for: indexPath
+        ) as? LocationCellView else {
+            return UITableViewCell()
+        }
+        cell.viewModel = cellViewModel
+        return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension CreateEditEntryViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        locationRows[indexPath.row].height
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let row = locationRows[indexPath.row]
+        interactor?.selectLocation(request: .manual(row: row))
+    }
+}
+
+// MARK: - CreateEditEntryDisplayLogic
 extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
     func configureNavigationBarTitle(viewModel: CreateEditEntry.ConfigurePurpose.ViewModel) {
         title = viewModel.title
+    }
+    
+    func displayLocationSearchResults(viewModel: CreateEditEntry.SearchLocation.ViewModel) {
+        switch viewModel {
+        case .loading:
+            searchLoadingIndicator.startAnimating()
+            locationRows = []
+        case .success(let results):
+            searchLoadingIndicator.stopAnimating()
+            locationRows = results
+            showSearchContainer(with: results.map(\.height).reduce(0, +) + 48)
+            searchResultsTableView.reloadData()
+        case .userCancelled:
+            searchLoadingIndicator.stopAnimating()
+            locationRows = []
+            searchResultsTableView.reloadData()
+            hideSearchContainer()
+        case .failure(let alertTitle, let alertMessage):
+            searchLoadingIndicator.stopAnimating()
+            locationRows = []
+            searchResultsTableView.reloadData()
+            hideSearchContainer()
+            showAlert(with: alertTitle, message: alertMessage)
+        }
+    }
+    
+    func displaySelectedLocation(viewModel: CreateEditEntry.ChooseLocation.ViewModel) {
+        didSelectLocationProgrammatically = true
+        view.endEditing(true)
+        switch viewModel {
+        case .success(let description):
+            locationSearchField.text = description
+        case .none:
+            locationSearchField.text = nil
+        case .failure(let alertTitle, let alertMessage):
+            showAlert(with: alertTitle, message: alertMessage)
+        }
+    }
+    
+    func detintCurrentLocationButton() {
+        getCurrentLocationButton.tintColor = .systemGray
     }
 }

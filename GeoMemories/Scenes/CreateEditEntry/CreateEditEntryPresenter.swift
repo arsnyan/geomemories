@@ -11,9 +11,14 @@
 //
 
 import Foundation
+import MapKit
+import CoreLocation
+import Contacts
 
 protocol CreateEditEntryPresentationLogic {
     func presentNavigationBarTitle(response: CreateEditEntry.ConfigurePurpose.Response)
+    func presentLocationSearchResults(response: CreateEditEntry.SearchLocation.Response)
+    func presentSelectedLocation(response: CreateEditEntry.ChooseLocation.Response)
 }
 
 class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
@@ -23,5 +28,113 @@ class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
         let title = String(localized: response.isEditMode ? "editingTitle" : "creatingTitle")
         let viewModel = CreateEditEntry.ConfigurePurpose.ViewModel(title: title)
         viewController?.configureNavigationBarTitle(viewModel: viewModel)
+    }
+    
+    func presentLocationSearchResults(
+        response: CreateEditEntry.SearchLocation.Response
+    ) {
+        switch response {
+        case .loading:
+            viewController?.displayLocationSearchResults(viewModel: .loading)
+        case .success(let results):
+            let rows: [LocationCellViewModelProtocol] = results.prefix(5).compactMap {
+                LocationCellViewModel(mapItem: $0)
+            }
+            
+            viewController?.displayLocationSearchResults(
+                viewModel: .success(results: rows)
+            )
+        case .failure(let error):
+            let title = String(localized: "genericErrorTitle")
+            let message = String(localized: "noLocalizedErrorMessage")
+                + "\n\(error.localizedDescription)"
+            
+            viewController?.displayLocationSearchResults(
+                viewModel: .failure(
+                    alertTitle: title,
+                    alertMessage: message
+                )
+            )
+        case .userCancelled:
+            viewController?.displayLocationSearchResults(viewModel: .userCancelled)
+            viewController?.displaySelectedLocation(viewModel: .none)
+        }
+    }
+    
+    func presentSelectedLocation(response: CreateEditEntry.ChooseLocation.Response) {
+        switch response {
+        case .empty:
+            viewController?.displaySelectedLocation(viewModel: .none)
+        case .successWithCurrentLocation(let location):
+            viewController?.displaySelectedLocation(
+                viewModel: .success(
+                    description: coordinatesToString(location.coordinate)
+                )
+            )
+        case .successWithSelectedLocation(let mapItem):
+            var description = ""
+            if #available(iOS 26.0, *) {
+                description = mapItem.address?.fullAddress
+                    ?? coordinatesToString(mapItem.location.coordinate)
+            } else {
+                if let postalAddress = mapItem.placemark.postalAddress {
+                    let formatter = CNPostalAddressFormatter()
+                    description = formatter.string(from: postalAddress)
+                    
+                    return
+                }
+                let placemark = mapItem.placemark
+                let addressParts = [
+                    placemark.name, placemark.thoroughfare,
+                    placemark.subThoroughfare, placemark.locality,
+                    placemark.subAdministrativeArea, placemark.administrativeArea,
+                    placemark.postalCode, placemark.country
+                ]
+                
+                description = addressParts.compactMap(\.self).joined(separator: ", ")
+            }
+            
+            viewController?.displaySelectedLocation(
+                viewModel: .success(description: description)
+            )
+            viewController?.detintCurrentLocationButton()
+        case .failure(let error):
+            let title: String
+            let message: String
+            
+            switch error {
+            case .permissionDenied:
+                title = String(localized: "locationServicesNotAuthorizedTitle")
+                message = String(localized: "locationServicesNotAuthorizedMessage")
+            case .failedToFetchLocation(let error):
+                title = String(localized: "error")
+                message = String(localized: "noLocalizedErrorMessage") + "\n" + error.localizedDescription
+            case .failedToFindLocations(let error):
+                title = String(localized: "error")
+                message = String(localized: "failedToFindLocationsMessage") + "\n" + error.localizedDescription
+            case .unknown:
+                title = String(localized: "genericErrorTitle")
+                message = String(localized: "unknownErrorMessage")
+            }
+            
+            viewController?.displaySelectedLocation(
+                viewModel: .failure(
+                    alertTitle: title,
+                    alertMessage: message
+                )
+            )
+        }
+        
+        viewController?.displayLocationSearchResults(viewModel: .userCancelled)
+    }
+}
+
+// MARK: - Helper Methods
+private extension CreateEditEntryPresenter {
+    func coordinatesToString(_ coord: CLLocationCoordinate2D) -> String {
+        let lat = coord.latitude
+        let lng = coord.longitude
+        // Always show the sign (+ or -) of the coordinate regex
+        return String(format: "%+.6f, %+.6f", lat, lng)
     }
 }

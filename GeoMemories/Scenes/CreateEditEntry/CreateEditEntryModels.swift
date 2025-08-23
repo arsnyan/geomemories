@@ -10,6 +10,8 @@
 //  see http://clean-swift.com
 //
 
+import MapKit
+
 // swiftlint:disable nesting
 enum CreateEditEntry {
     // MARK: Use cases
@@ -20,6 +22,28 @@ enum CreateEditEntry {
         
         struct ViewModel {
             let title: String
+        }
+    }
+    
+    enum SearchLocation {
+        enum Request {
+            case clear
+            case cancelled
+            case search(query: String)
+        }
+        
+        enum Response {
+            case loading
+            case success(results: [MKMapItem])
+            case failure(error: Error)
+            case userCancelled
+        }
+        
+        enum ViewModel {
+            case loading
+            case success(results: [LocationCellViewModelProtocol])
+            case userCancelled
+            case failure(alertTitle: String, alertMessage: String)
         }
     }
     
@@ -41,22 +65,25 @@ enum CreateEditEntry {
         
     }
     
-    enum ChooseManualLocation {
-        struct Request {
-            
+    enum ChooseLocation {
+        enum Request {
+            case abort
+            case manual(row: LocationCellViewModelProtocol)
+            case current
         }
         
-        struct Response {
-            
+        enum Response {
+            case empty
+            case successWithSelectedLocation(mapItem: MKMapItem)
+            case successWithCurrentLocation(location: CLLocation)
+            case failure(error: LocationError)
         }
         
-        struct ViewModel {
-            
+        enum ViewModel {
+            case success(description: String)
+            case failure(alertTitle: String, alertMessage: String)
+            case none
         }
-    }
-    
-    enum ChooseCurrentLocation {
-        
     }
     
     enum AddPhoto {

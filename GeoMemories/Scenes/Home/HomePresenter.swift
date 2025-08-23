@@ -76,6 +76,7 @@ class HomePresenter: HomePresentationLogic {
                     )
                 )
             }
+            viewController?.displayMapEntries(viewModel: .sucess(annotations: annotations))
         case .failure(let error):
             let title: String
             let message: String

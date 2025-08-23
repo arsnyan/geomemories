@@ -8,11 +8,12 @@
 import UIKit
 
 class RoundedCornersTextField: UITextField {
-    var padding: UIEdgeInsets {
-        get {
-            return UIEdgeInsets(top: 0, left: paddingValue, bottom: 0, right: paddingValue)
-        }
-    }
+    private lazy var padding = UIEdgeInsets(
+        top: 0,
+        left: paddingValue,
+        bottom: 0,
+        right: paddingValue
+    )
     
     @IBInspectable var paddingValue: CGFloat = 16
     
@@ -29,17 +30,34 @@ class RoundedCornersTextField: UITextField {
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
-        let rect = super.textRect(forBounds: bounds)
-        return rect.inset(by: padding)
+        insetTextRect(forBounds: bounds)
     }
     
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        let rect = super.placeholderRect(forBounds: bounds)
-        return rect.inset(by: padding)
+        insetTextRect(forBounds: bounds)
     }
     
     override func editingRect(forBounds bounds: CGRect) -> CGRect {
-        let rect = super.editingRect(forBounds: bounds)
-        return rect.inset(by: padding)
+        insetTextRect(forBounds: bounds)
+    }
+    
+    override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
+        var rect = super.rightViewRect(forBounds: bounds)
+        rect.origin.x -= paddingValue
+        return rect
+    }
+    
+    override func clearButtonRect(forBounds bounds: CGRect) -> CGRect {
+        var rect = super.clearButtonRect(forBounds: bounds)
+        rect.origin.x -= paddingValue / 2
+        return rect
+    }
+    
+    private func insetTextRect(forBounds bounds: CGRect) -> CGRect {
+        var insetBounds = bounds.inset(by: padding)
+        if let rightView {
+            insetBounds.size.width -= paddingValue + rightView.bounds.width
+        }
+        return insetBounds
     }
 }
