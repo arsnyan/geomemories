@@ -57,6 +57,8 @@ class HomeRouter: NSObject, HomeRoutingLogic, HomeDataPassing {
             sheet.prefersScrollingExpandsWhenScrolledToEdge = true
             sheet.prefersEdgeAttachedInCompactHeight = true
             sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
+            
+            navigationController.isModalInPresentation = true
         }
         source.navigationController?.present(navigationController, animated: true)
     }

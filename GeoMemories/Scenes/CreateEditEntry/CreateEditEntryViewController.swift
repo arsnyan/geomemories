@@ -95,6 +95,56 @@ class CreateEditEntryViewController: UIViewController {
         return indicator
     }()
     
+    private lazy var titleTextField: RoundedCornersTextField = {
+        let textField = RoundedCornersTextField()
+        textField.placeholder = String(localized: "geoEntryTitleTextFieldPlaceholder")
+        textField.backgroundColor = .black.withAlphaComponent(0.1)
+        textField.paddingValue = 16
+        textField.layer.cornerRadius = 24
+        textField.clearButtonMode = .whileEditing
+        textField.delegate = self
+        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        return textField
+    }()
+    
+    private lazy var descriptionTextField: RoundedCornersTextField = {
+        let textField = RoundedCornersTextField()
+        textField.placeholder = String(localized: "geoEntryDescriptionTextFieldPlaceholder")
+        textField.backgroundColor = .black.withAlphaComponent(0.1)
+        textField.paddingValue = 16
+        textField.layer.cornerRadius = 24
+        textField.clearButtonMode = .whileEditing
+        textField.delegate = self
+        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        return textField
+    }()
+    
+    private let addImageButton: UIButton = {
+        var config = UIButton.Configuration.borderedTinted()
+        // TODO: - localize stuff
+        config.title = "Take image / Add image from gallery"
+        config.image = UIImage(systemName: "camera")
+        config.imagePlacement = .top
+        config.imagePadding = 8
+        
+        let button = UIButton(configuration: config)
+        button.tintColor = .systemGray
+        return button
+    }()
+    
+    private let addVideoButton: UIButton = {
+        var config = UIButton.Configuration.borderedTinted()
+        // TODO: - localize stuff
+        config.title = "Take video / Add video from gallery"
+        config.image = UIImage(systemName: "video")
+        config.imagePlacement = .top
+        config.imagePadding = 8
+        
+        let button = UIButton(configuration: config)
+        button.tintColor = .systemGray
+        return button
+    }()
+    
     // MARK: View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -102,7 +152,6 @@ class CreateEditEntryViewController: UIViewController {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
         view.endEditing(true)
     }
 }
@@ -161,6 +210,16 @@ private extension CreateEditEntryViewController {
         view.addSubview(locationSearchContrainer)
         view.bringSubviewToFront(locationSearchField)
         
+        view.addSubview(titleTextField)
+        view.addSubview(descriptionTextField)
+        
+        let mediaStackView = UIStackView(arrangedSubviews: [addImageButton, addVideoButton])
+        mediaStackView.axis = .horizontal
+        mediaStackView.spacing = 16
+        mediaStackView.alignment = .fill
+        mediaStackView.distribution = .fillEqually
+        view.addSubview(mediaStackView)
+        
         locationSearchField.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalToSuperview().offset(-16)
@@ -183,6 +242,24 @@ private extension CreateEditEntryViewController {
                     right: 0
                 )
             )
+        }
+        
+        titleTextField.snp.makeConstraints { make in
+            make.top.equalTo(locationSearchField.snp.bottom).offset(16)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.height.equalTo(48)
+        }
+        
+        descriptionTextField.snp.makeConstraints { make in
+            make.top.equalTo(titleTextField.snp.bottom).offset(16)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.height.equalTo(144)
+        }
+        
+        mediaStackView.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.top.equalTo(descriptionTextField.snp.bottom).offset(16)
+            make.height.equalTo(96)
         }
     }
     
@@ -210,32 +287,41 @@ private extension CreateEditEntryViewController {
     }
     
     func textFieldDidChange(_ textField: UITextField) {
-        searchTimer?.invalidate()
-        
-        guard let text = textField.text,
-              !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            getCurrentLocationButton.tintColor = .systemGray
-            interactor?.provideLocationSearchResults(request: .clear)
-            return
+        switch textField {
+        case locationSearchField:
+            searchTimer?.invalidate()
+            
+            guard let text = textField.text,
+                  !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                getCurrentLocationButton.tintColor = .systemGray
+                interactor?.provideLocationSearchResults(request: .clear)
+                return
+            }
+            
+            #if DEBUG
+            searchTimer = Timer.scheduledTimer(
+                withTimeInterval: 2,
+                repeats: false,
+                block: { [weak self] _ in
+                    self?.interactor?.provideLocationSearchResults(request: .search(query: text))
+                }
+            )
+            #else
+            searchTimer = Timer.scheduledTimer(
+                withTimeInterval: 1,
+                repeats: false,
+                block: { [weak self] _ in
+                    self?.interactor?.provideLocationSearchResults(request: .search(query: text))
+                }
+            )
+            #endif
+        case titleTextField:
+            break
+        case descriptionTextField:
+            break
+        default:
+            fatalError("Unimplemented text field: \(textField)")
         }
-        
-        #if DEBUG
-        searchTimer = Timer.scheduledTimer(
-            withTimeInterval: 2,
-            repeats: false,
-            block: { [weak self] _ in
-                self?.interactor?.provideLocationSearchResults(request: .search(query: text))
-            }
-        )
-        #else
-        searchTimer = Timer.scheduledTimer(
-            withTimeInterval: 1,
-            repeats: false,
-            block: { [weak self] _ in
-                self?.interactor?.provideLocationSearchResults(request: .search(query: text))
-            }
-        )
-        #endif
     }
     
     func currentLocationButtonDidTap() {
@@ -246,24 +332,50 @@ private extension CreateEditEntryViewController {
 // MARK: - UITextFieldDelegate
 extension CreateEditEntryViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        if let text = textField.text,
-           !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            interactor?.provideLocationSearchResults(request: .search(query: text))
+        switch textField {
+        case locationSearchField:
+            if let text = textField.text,
+               !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                interactor?.provideLocationSearchResults(request: .search(query: text))
+            }
+        case titleTextField:
+            break
+        case descriptionTextField:
+            break
+        default:
+            fatalError("Unimplemented text field: \(textField)")
         }
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            guard !self.didSelectLocationProgrammatically else {
-                self.didSelectLocationProgrammatically = false
-                return
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        switch textField {
+        case locationSearchField:
+            if !didSelectLocationProgrammatically {
+                interactor?.provideLocationSearchResults(request: .cancelled)
+            } else {
+                didSelectLocationProgrammatically = false
             }
-            self.interactor?.provideLocationSearchResults(request: .cancelled)
+        case titleTextField:
+            break
+        case descriptionTextField:
+            break
+        default:
+            fatalError("Unimplemented text field: \(textField)")
         }
+        return true
     }
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        interactor?.provideLocationSearchResults(request: .clear)
+        switch textField {
+        case locationSearchField:
+            interactor?.provideLocationSearchResults(request: .clear)
+        case titleTextField:
+            break
+        case descriptionTextField:
+            break
+        default:
+            fatalError("Unimplemented text field: \(textField)")
+        }
         return true
     }
 }
@@ -293,6 +405,11 @@ extension CreateEditEntryViewController: UITableViewDelegate {
         locationRows[indexPath.row].height
     }
     
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        let viewModel = locationRows[indexPath.row]
+        return viewModel.isSelectable ? indexPath : nil
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let row = locationRows[indexPath.row]
@@ -304,9 +421,15 @@ extension CreateEditEntryViewController: UITableViewDelegate {
 extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
     func configureNavigationBarTitle(viewModel: CreateEditEntry.ConfigurePurpose.ViewModel) {
         title = viewModel.title
+        // FIXME: - do not put this into this method, this is just for testing
+        navigationItem.leftBarButtonItem = UIBarButtonItem(systemItem: .save)
     }
     
-    func displayLocationSearchResults(viewModel: CreateEditEntry.SearchLocation.ViewModel) {
+    func displayLocationSearchResults(
+        viewModel: CreateEditEntry.SearchLocation.ViewModel
+    ) {
+        didSelectLocationProgrammatically = false
+        
         switch viewModel {
         case .loading:
             searchLoadingIndicator.startAnimating()
@@ -333,6 +456,7 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
     func displaySelectedLocation(viewModel: CreateEditEntry.ChooseLocation.ViewModel) {
         didSelectLocationProgrammatically = true
         view.endEditing(true)
+        
         switch viewModel {
         case .success(let description):
             locationSearchField.text = description

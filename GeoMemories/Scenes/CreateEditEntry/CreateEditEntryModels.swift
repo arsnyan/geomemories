@@ -35,7 +35,7 @@ enum CreateEditEntry {
         enum Response {
             case loading
             case success(results: [MKMapItem])
-            case failure(error: Error)
+            case failure(error: LocationError)
             case userCancelled
         }
         

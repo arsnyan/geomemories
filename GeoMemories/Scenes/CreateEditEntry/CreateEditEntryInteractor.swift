@@ -50,8 +50,7 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
     private let cachedSearchResults = NSCache<NSString, NSArray>()
     
     func provideNavigationBarTitle() {
-        let response = CreateEditEntry.ConfigurePurpose.Response(isEditMode: entry != nil)
-        presenter?.presentNavigationBarTitle(response: response)
+        presenter?.presentNavigationBarTitle(response: .init(isEditMode: entry != nil))
     }
     
     func provideLocationSearchResults(request: CreateEditEntry.SearchLocation.Request) {
@@ -67,9 +66,7 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
                 guard let cachedResults = genericCachedResults
                         as? [MKMapItem] else {
                     presenter?.presentLocationSearchResults(
-                        response: .failure(
-                            error: CreateEditEntryError.failedToTransformCache
-                        )
+                        response: .failure(error: .cachingError)
                     )
                     logger.trace(
                         "Failed to transform cached results for query: \(query)"
@@ -117,8 +114,12 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
         case .abort:
             presenter?.presentSelectedLocation(response: .empty)
         case .manual(let row):
+            guard let mapItem = row.mapItem else {
+                return
+            }
+            
             presenter?.presentSelectedLocation(
-                response: .successWithSelectedLocation(mapItem: row.mapItem)
+                response: .successWithSelectedLocation(mapItem: mapItem)
             )
         case .current:
             locationWorker?.getCurrentLocation()

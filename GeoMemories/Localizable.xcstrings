@@ -145,6 +145,12 @@
         }
       }
     },
+    "geoEntryDescriptionTextFieldPlaceholder" : {
+
+    },
+    "geoEntryTitleTextFieldPlaceholder" : {
+
+    },
     "getCurrentLocationButtonActionTitle" : {
       "localizations" : {
         "en" : {
@@ -188,7 +194,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вы не дали доступ к сервисам геолокации, поэтому воспользоваться этой функцией не получтся"
+            "value" : "Вы не дали доступ к сервисам геолокации, поэтому воспользоваться этой функцией не получится"
           }
         }
       }

@@ -10,21 +10,28 @@ import MapKit
 import Contacts
 
 protocol LocationCellViewModelProtocol {
-    var mapItem: MKMapItem { get }
+    var mapItem: MKMapItem? { get }
     var height: Double { get }
     var description: String { get }
     
-    init(mapItem: MKMapItem)
+    var isSelectable: Bool { get }
+    
+    init(mapItem: MKMapItem?)
 }
 
 struct LocationCellViewModel: LocationCellViewModelProtocol {
-    private(set) var mapItem: MKMapItem
+    private(set) var mapItem: MKMapItem?
     
     var height: Double {
-        60
+        48
     }
     
     var description: String {
+        guard let mapItem else {
+            
+            return "Nothing to show"
+        }
+        
         var description = ""
         if #available(iOS 26.0, *) {
             description = mapItem.address?.fullAddress
@@ -55,7 +62,11 @@ struct LocationCellViewModel: LocationCellViewModelProtocol {
         return description
     }
     
-    init(mapItem: MKMapItem) {
+    var isSelectable: Bool {
+        return mapItem != nil
+    }
+    
+    init(mapItem: MKMapItem?) {
         self.mapItem = mapItem
     }
     

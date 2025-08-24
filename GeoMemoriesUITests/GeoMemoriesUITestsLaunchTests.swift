@@ -30,4 +30,6 @@ final class GeoMemoriesUITestsLaunchTests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+    
+    
 }

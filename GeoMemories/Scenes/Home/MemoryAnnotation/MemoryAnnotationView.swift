@@ -15,6 +15,9 @@ class MemoryAnnotationView: MKMarkerAnnotationView {
         didSet {
             guard let memoryAnnotation = annotation as? MemoryAnnotation else { return }
             
+            // TODO: - really would rather make a custom clustering image — https://medium.com/mobilepeople/enhance-your-map-experience-with-annotations-13e28507f892
+            clusteringIdentifier = "memories"
+            
             if let baseImage = memoryAnnotation.image {
                 glyphImage = circularImage(
                     from: baseImage,

@@ -10,9 +10,9 @@ import Combine
 import CoreStore
 @testable import GeoMemories
 
-class MockDataStack: DataStackProtocol {
-    
-}
+//class MockDataStack: DataStackProtocol {
+//    
+//}
 
 final class StorageServiceTests: XCTestCase {
 

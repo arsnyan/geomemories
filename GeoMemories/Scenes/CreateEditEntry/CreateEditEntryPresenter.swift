@@ -41,6 +41,17 @@ class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
         case .loading:
             viewController?.displayLocationSearchResults(viewModel: .loading)
         case .success(let results):
+            guard !results.isEmpty else {
+                let rows: [LocationCellViewModelProtocol] = [
+                    LocationCellViewModel(mapItem: nil)
+                ]
+                
+                viewController?.displayLocationSearchResults(
+                    viewModel: .success(results: rows)
+                )
+                return
+            }
+            
             let rows: [LocationCellViewModelProtocol] = results.prefix(5).compactMap {
                 LocationCellViewModel(mapItem: $0)
             }
@@ -49,9 +60,20 @@ class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
                 viewModel: .success(results: rows)
             )
         case .failure(let error):
-            let title = String(localized: "genericErrorTitle")
-            let message = String(localized: "noLocalizedErrorMessage")
-                + "\n\(error.localizedDescription)"
+            let title: String
+            let message: String
+            
+            switch error {
+            case .failedToFindLocations(let error):
+                title = String(localized: "genericErrorTitle")
+                message = String(localized: "failedToFindLocationsMessage")
+                    + error.localizedDescription
+            case .unknown:
+                title = String(localized: "error")
+                message = String(localized: "unknownErrorMessage")
+            default:
+                return
+            }
             
             viewController?.displayLocationSearchResults(
                 viewModel: .failure(
@@ -63,12 +85,17 @@ class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
             viewController?.displayLocationSearchResults(viewModel: .userCancelled)
             viewController?.displaySelectedLocation(viewModel: .none)
         }
+        
+        viewController?.detintCurrentLocationButton()
     }
     
-    func presentSelectedLocation(response: CreateEditEntry.ChooseLocation.Response) {
+    func presentSelectedLocation(
+        response: CreateEditEntry.ChooseLocation.Response
+    ) {
         switch response {
         case .empty:
             viewController?.displaySelectedLocation(viewModel: .none)
+            viewController?.detintCurrentLocationButton()
         case .successWithCurrentLocation(let location):
             viewController?.displaySelectedLocation(
                 viewModel: .success(
@@ -116,7 +143,7 @@ class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
             case .failedToFindLocations(let error):
                 title = String(localized: "error")
                 message = String(localized: "failedToFindLocationsMessage") + "\n" + error.localizedDescription
-            case .unknown:
+            default:
                 title = String(localized: "genericErrorTitle")
                 message = String(localized: "unknownErrorMessage")
             }
@@ -127,6 +154,7 @@ class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
                     alertMessage: message
                 )
             )
+            viewController?.detintCurrentLocationButton()
         }
         
         viewController?.displayLocationSearchResults(viewModel: .userCancelled)

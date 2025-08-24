@@ -38,6 +38,7 @@ enum LocationError: LocalizedError {
     case permissionDenied
     case failedToFetchLocation(Error)
     case failedToFindLocations(Error)
+    case cachingError
     case unknown
     
     var errorDescription: String? {
@@ -48,6 +49,8 @@ enum LocationError: LocalizedError {
             "Failed to fetch location: \(error.localizedDescription)"
         case .failedToFindLocations(let error):
             "Failed to find locations: \(error.localizedDescription)"
+        case .cachingError:
+            "Caching was not done correctly"
         case .unknown:
             "Unknown error"
         }
@@ -125,24 +128,21 @@ class LocationWorker: NSObject {
             .mapError({ LocationError.failedToFindLocations($0) })
             .flatMap { completions -> AnyPublisher<[MKMapItem], LocationError> in
                 let searches = completions.map { completion in
-                    Future<MKMapItem, LocationError> { promise in
+                    Future<MKMapItem?, LocationError> { promise in
                         let request = MKLocalSearch.Request(completion: completion)
                         
                         MKLocalSearch(request: request).start { response, error in
                             if let error {
-                                promise(
-                                    .failure(.failedToFindLocations(error))
-                                )
-                            } else if let item = response?.mapItems.first {
-                                promise(.success(item))
+                                promise(.failure(.failedToFindLocations(error)))
                             } else {
-                                promise(.failure(.unknown))
+                                promise(.success(response?.mapItems.first))
                             }
                         }
                     }
                 }
                 
                 return Publishers.MergeMany(searches)
+                    .compactMap { $0 }
                     .collect()
                     .eraseToAnyPublisher()
             }
