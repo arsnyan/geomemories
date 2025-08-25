@@ -41,6 +41,12 @@ class RoundedCornersTextField: UITextField {
         insetTextRect(forBounds: bounds)
     }
     
+    override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+        var rect = super.leftViewRect(forBounds: bounds)
+        rect.origin.x += paddingValue
+        return rect
+    }
+    
     override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
         var rect = super.rightViewRect(forBounds: bounds)
         rect.origin.x -= paddingValue
@@ -57,6 +63,14 @@ class RoundedCornersTextField: UITextField {
         var insetBounds = bounds.inset(by: padding)
         if let rightView {
             insetBounds.size.width -= paddingValue + rightView.bounds.width
+        }
+        if let leftView {
+            insetBounds.origin.x += leftView.bounds.width + paddingValue / 2
+            insetBounds.size.width -= paddingValue + leftView.bounds.width
+        }
+        if clearButtonMode != .never {
+            let clearRect = super.clearButtonRect(forBounds: bounds)
+            insetBounds.size.width -= clearRect.width
         }
         return insetBounds
     }

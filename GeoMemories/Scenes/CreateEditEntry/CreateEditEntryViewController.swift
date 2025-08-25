@@ -34,89 +34,95 @@ class CreateEditEntryViewController: UIViewController {
     
     // MARK: - UI Components
     
-    private let getCurrentLocationButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "location.fill"), for: .normal)
-        button.tintColor = .systemGray
-        let action = UIAction(
-            discoverabilityTitle: String(
-                localized: "getCurrentLocationButtonActionTitle"
-            ),
-            handler: { _ in
-                button.tintColor = .systemBlue
-            }
-        )
-        button.addAction(action, for: .touchUpInside)
-        return button
-    }()
-    
-    private lazy var locationSearchField: RoundedCornersTextField = {
+    private lazy var locationSearchTextField: RoundedCornersTextField = {
         let textField = RoundedCornersTextField()
         textField.placeholder = String(localized: "locationSearchFieldPlaceholder")
         textField.backgroundColor = .black.withAlphaComponent(0.1)
-        textField.paddingValue = 16
-        textField.layer.cornerRadius = 24
-        textField.rightView = getCurrentLocationButton
+        textField.rightView = currentLocationButton
         textField.rightViewMode = .unlessEditing
         textField.clearButtonMode = .whileEditing
-        textField.delegate = self
-        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        textField.returnKeyType = .search
         return textField
     }()
     
-    private lazy var locationSearchContrainer: UIView = {
+    private let currentLocationButton: UIButton = {
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "location.fill")
+        config.buttonSize = .mini
+        
+        let button = UIButton(configuration: config)
+        button.tintColor = .systemGray
+        return button
+    }()
+    
+    private let searchResultsTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .singleLine
+        tableView.showsVerticalScrollIndicator = false
+        return tableView
+    }()
+    
+    private let locationSearchContrainer: UIView = {
         let view = UIView()
         view.backgroundColor = .black.withAlphaComponent(0.1)
-        view.layer.cornerRadius = 24
+        if #available(iOS 26.0, *) {
+            view.cornerConfiguration = .corners(radius: .containerConcentric())
+        } else {
+            view.layer.cornerRadius = 16
+        }
         view.clipsToBounds = true
         view.layer.masksToBounds = true
         view.isHidden = true
         return view
     }()
     
-    private lazy var searchResultsTableView: UITableView = {
-        let tableView = UITableView()
-        tableView.backgroundColor = .clear
-        tableView.separatorStyle = .none
-        tableView.showsVerticalScrollIndicator = false
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(
-            LocationCellView.self,
-            forCellReuseIdentifier: LocationCellView.reuseIdentifier
-        )
-        return tableView
-    }()
-    
-    private lazy var searchLoadingIndicator: UIActivityIndicatorView = {
+    private let searchActivityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
-        indicator.center = searchResultsTableView.center
         return indicator
     }()
     
-    private lazy var titleTextField: RoundedCornersTextField = {
+    private let entryTitleTextField: RoundedCornersTextField = {
         let textField = RoundedCornersTextField()
         textField.placeholder = String(localized: "geoEntryTitleTextFieldPlaceholder")
         textField.backgroundColor = .black.withAlphaComponent(0.1)
-        textField.paddingValue = 16
-        textField.layer.cornerRadius = 24
+        textField.layer.cornerRadius = 16
         textField.clearButtonMode = .whileEditing
-        textField.delegate = self
-        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        textField.returnKeyType = .next
         return textField
     }()
     
-    private lazy var descriptionTextField: RoundedCornersTextField = {
-        let textField = RoundedCornersTextField()
-        textField.placeholder = String(localized: "geoEntryDescriptionTextFieldPlaceholder")
-        textField.backgroundColor = .black.withAlphaComponent(0.1)
-        textField.paddingValue = 16
-        textField.layer.cornerRadius = 24
-        textField.clearButtonMode = .whileEditing
-        textField.delegate = self
-        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-        return textField
+    private let entryDescriptionContainerView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 16
+        view.layer.masksToBounds = true
+        view.backgroundColor = .black.withAlphaComponent(0.1)
+        return view
+    }()
+    
+    private let placeholderContainerView: UIView = GradientView(colors: [
+        .black.withAlphaComponent(0.1),
+        .black.withAlphaComponent(0.3)
+    ])
+    
+    private let entryDescriptionPlaceholderLabel: UILabel = {
+        let label = UILabel()
+        label.text = String(localized: "geoEntryDescriptionTextFieldPlaceholder")
+        label.font = .systemFont(ofSize: 14)
+        label.numberOfLines = 0
+        label.layer.masksToBounds = true
+        
+        return label
+    }()
+    
+    private lazy var entryDescriptionTextView: UITextView = {
+        let textView = UITextView()
+        textView.backgroundColor = .clear
+        textView.textContainerInset = .zero
+        textView.font = .systemFont(ofSize: 17)
+        textView.returnKeyType = .done
+        return textView
     }()
     
     private let addImageButton: UIButton = {
@@ -189,29 +195,53 @@ private extension CreateEditEntryViewController {
 private extension CreateEditEntryViewController {
     func setupUI() {
         interactor?.provideNavigationBarTitle()
+        
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .cancel,
             target: self,
             action: #selector(dismissSheet)
         )
         
-        getCurrentLocationButton.addTarget(
+        currentLocationButton.addTarget(
             self,
             action: #selector(currentLocationButtonDidTap),
             for: .touchUpInside
         )
         
+        locationSearchTextField.delegate = self
+        entryTitleTextField.delegate = self
+        //entryDescriptionTextField.delegate = self
+        
+        locationSearchTextField.addTarget(
+            self,
+            action: #selector(handleLocationSearchTextChange),
+            for: .editingChanged
+        )
+        
+        searchResultsTableView.delegate = self
+        searchResultsTableView.dataSource = self
+        searchResultsTableView.register(
+            LocationCellView.self,
+            forCellReuseIdentifier: LocationCellView.reuseIdentifier
+        )
+        
+        // FIXME: - Might not be necessary
+        searchActivityIndicator.center = searchResultsTableView.center
+        
         setupConstraints()
     }
     
     func setupConstraints() {
-        view.addSubview(locationSearchField)
+        view.addSubview(locationSearchTextField)
         locationSearchContrainer.addSubview(searchResultsTableView)
         view.addSubview(locationSearchContrainer)
-        view.bringSubviewToFront(locationSearchField)
+        view.bringSubviewToFront(locationSearchTextField)
         
-        view.addSubview(titleTextField)
-        view.addSubview(descriptionTextField)
+        view.addSubview(entryTitleTextField)
+        view.addSubview(entryDescriptionContainerView)
+        placeholderContainerView.addSubview(entryDescriptionPlaceholderLabel)
+        entryDescriptionContainerView.addSubview(placeholderContainerView)
+        entryDescriptionContainerView.addSubview(entryDescriptionTextView)
         
         let mediaStackView = UIStackView(arrangedSubviews: [addImageButton, addVideoButton])
         mediaStackView.axis = .horizontal
@@ -220,16 +250,23 @@ private extension CreateEditEntryViewController {
         mediaStackView.distribution = .fillEqually
         view.addSubview(mediaStackView)
         
-        locationSearchField.snp.makeConstraints { make in
+        // FIXME: - to be removed
+        if #available(iOS 26.0, *) {
+            locationSearchTextField.cornerConfiguration = .corners(radius: .containerConcentric())
+        } else {
+            locationSearchTextField.layer.cornerRadius = 16
+        }
+        
+        locationSearchTextField.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalToSuperview().offset(-16)
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            make.height.equalTo(48)
+            make.height.equalTo(44)
         }
         
         locationSearchContrainer.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(locationSearchField)
-            make.top.equalTo(locationSearchField.snp.bottom).offset(-48)
+            make.leading.trailing.equalTo(locationSearchTextField)
+            make.top.equalTo(locationSearchTextField.snp.bottom).offset(-48)
             make.height.equalTo(0)
         }
         
@@ -244,21 +281,37 @@ private extension CreateEditEntryViewController {
             )
         }
         
-        titleTextField.snp.makeConstraints { make in
-            make.top.equalTo(locationSearchField.snp.bottom).offset(16)
+        entryTitleTextField.snp.makeConstraints { make in
+            make.top.equalTo(locationSearchTextField.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(48)
+            make.height.equalTo(44)
         }
         
-        descriptionTextField.snp.makeConstraints { make in
-            make.top.equalTo(titleTextField.snp.bottom).offset(16)
+        entryDescriptionContainerView.snp.makeConstraints { make in
+            make.top.equalTo(entryTitleTextField.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(144)
+            make.height.equalTo(192)
+        }
+        
+        placeholderContainerView.snp.makeConstraints { make in
+            make.height.equalTo(36)
+            make.leading.top.trailing.equalToSuperview()
+        }
+        
+        entryDescriptionPlaceholderLabel.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.top.bottom.equalToSuperview()
+        }
+        
+        entryDescriptionTextView.snp.makeConstraints { make in
+            make.top.equalTo(placeholderContainerView.snp.bottom)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview()
         }
         
         mediaStackView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(descriptionTextField.snp.bottom).offset(16)
+            make.top.equalTo(entryDescriptionTextView.snp.bottom).offset(16)
             make.height.equalTo(96)
         }
     }
@@ -286,14 +339,14 @@ private extension CreateEditEntryViewController {
         dismiss(animated: true)
     }
     
-    func textFieldDidChange(_ textField: UITextField) {
+    func handleLocationSearchTextChange(_ textField: UITextField) {
         switch textField {
-        case locationSearchField:
+        case locationSearchTextField:
             searchTimer?.invalidate()
             
             guard let text = textField.text,
                   !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                getCurrentLocationButton.tintColor = .systemGray
+                currentLocationButton.tintColor = .systemGray
                 interactor?.provideLocationSearchResults(request: .clear)
                 return
             }
@@ -315,9 +368,9 @@ private extension CreateEditEntryViewController {
                 }
             )
             #endif
-        case titleTextField:
+        case entryTitleTextField:
             break
-        case descriptionTextField:
+        case entryDescriptionTextView:
             break
         default:
             fatalError("Unimplemented text field: \(textField)")
@@ -325,6 +378,7 @@ private extension CreateEditEntryViewController {
     }
     
     func currentLocationButtonDidTap() {
+        currentLocationButton.tintColor = .systemBlue
         interactor?.selectLocation(request: .current)
     }
 }
@@ -333,14 +387,14 @@ private extension CreateEditEntryViewController {
 extension CreateEditEntryViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         switch textField {
-        case locationSearchField:
+        case locationSearchTextField:
             if let text = textField.text,
                !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 interactor?.provideLocationSearchResults(request: .search(query: text))
             }
-        case titleTextField:
+        case entryTitleTextField:
             break
-        case descriptionTextField:
+        case entryDescriptionTextView:
             break
         default:
             fatalError("Unimplemented text field: \(textField)")
@@ -349,15 +403,15 @@ extension CreateEditEntryViewController: UITextFieldDelegate {
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         switch textField {
-        case locationSearchField:
+        case locationSearchTextField:
             if !didSelectLocationProgrammatically {
                 interactor?.provideLocationSearchResults(request: .cancelled)
             } else {
                 didSelectLocationProgrammatically = false
             }
-        case titleTextField:
+        case entryTitleTextField:
             break
-        case descriptionTextField:
+        case entryDescriptionTextView:
             break
         default:
             fatalError("Unimplemented text field: \(textField)")
@@ -367,11 +421,11 @@ extension CreateEditEntryViewController: UITextFieldDelegate {
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         switch textField {
-        case locationSearchField:
+        case locationSearchTextField:
             interactor?.provideLocationSearchResults(request: .clear)
-        case titleTextField:
+        case entryTitleTextField:
             break
-        case descriptionTextField:
+        case entryDescriptionTextView:
             break
         default:
             fatalError("Unimplemented text field: \(textField)")
@@ -432,20 +486,20 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
         
         switch viewModel {
         case .loading:
-            searchLoadingIndicator.startAnimating()
+            searchActivityIndicator.startAnimating()
             locationRows = []
         case .success(let results):
-            searchLoadingIndicator.stopAnimating()
+            searchActivityIndicator.stopAnimating()
             locationRows = results
             showSearchContainer(with: results.map(\.height).reduce(0, +) + 48)
             searchResultsTableView.reloadData()
         case .userCancelled:
-            searchLoadingIndicator.stopAnimating()
+            searchActivityIndicator.stopAnimating()
             locationRows = []
             searchResultsTableView.reloadData()
             hideSearchContainer()
         case .failure(let alertTitle, let alertMessage):
-            searchLoadingIndicator.stopAnimating()
+            searchActivityIndicator.stopAnimating()
             locationRows = []
             searchResultsTableView.reloadData()
             hideSearchContainer()
@@ -459,15 +513,15 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
         
         switch viewModel {
         case .success(let description):
-            locationSearchField.text = description
+            locationSearchTextField.text = description
         case .none:
-            locationSearchField.text = nil
+            locationSearchTextField.text = nil
         case .failure(let alertTitle, let alertMessage):
             showAlert(with: alertTitle, message: alertMessage)
         }
     }
     
     func detintCurrentLocationButton() {
-        getCurrentLocationButton.tintColor = .systemGray
+        currentLocationButton.tintColor = .systemGray
     }
 }

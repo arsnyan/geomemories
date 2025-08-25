@@ -12,7 +12,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Что-то пошло не так в процессе работы с базой данных:"
+            "value" : "Что-то пошло не так в работе с базой данных:"
           }
         }
       }
@@ -38,7 +38,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Create an entry"
+            "value" : "Create"
           }
         },
         "ru" : {
@@ -86,7 +86,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit the entry"
+            "value" : "Edit"
           }
         },
         "ru" : {
@@ -146,23 +146,49 @@
       }
     },
     "geoEntryDescriptionTextFieldPlaceholder" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write something about this memory"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напишите что-то об этой заметке"
+          }
+        }
+      }
     },
     "geoEntryTitleTextFieldPlaceholder" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry title"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название заметки"
+          }
+        }
+      }
     },
     "getCurrentLocationButtonActionTitle" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Get current location for the geo entry location search field."
+            "value" : "Get current location for the geo entry location search field"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Указать текущее местоположение в поле поиска локаций."
+            "value" : "Указать текущее местоположение в поле поиска локаций"
           }
         }
       }
@@ -178,7 +204,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Введите адрес для поиска"
+            "value" : "Найти адрес"
           }
         }
       }
@@ -194,7 +220,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вы не дали доступ к сервисам геолокации, поэтому воспользоваться этой функцией не получится"
+            "value" : "Воспользоваться этой функцией не получится, так как вы не дали доступ к сервисам геолокации"
           }
         }
       }
@@ -226,7 +252,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Произошла ошибка, о которой стоит сообщить разработчикам:"
+            "value" : "Произошла ошибка, о которой нужно сообщить разработчикам:"
           }
         }
       }

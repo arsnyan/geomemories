@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E2246072E5B9B6100FDA259 /* SearchLocationContainerConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2246062E5B9B6100FDA259 /* SearchLocationContainerConfigurator.swift */; };
 		2E245CA62E5317900085B958 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CA02E5317900085B958 /* Assets.xcassets */; };
 		2E245CA82E5317900085B958 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CA32E5317900085B958 /* LaunchScreen.storyboard */; };
 		2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245C9F2E5317900085B958 /* AppDelegate.swift */; };
@@ -42,9 +43,14 @@
 		2E713D552E55F6FB002087EB /* CreateEditEntryWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D502E55F6FB002087EB /* CreateEditEntryWorker.swift */; };
 		2E713D562E55F6FB002087EB /* CreateEditEntryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */; };
 		2E713D582E560B52002087EB /* CreateEditEntryConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D572E560B52002087EB /* CreateEditEntryConfigurator.swift */; };
-		2E713D622E571F52002087EB /* RoundTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D612E571F52002087EB /* RoundTextField.swift */; };
+		2E713D622E571F52002087EB /* RoundedCornersTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D612E571F52002087EB /* RoundedCornersTextField.swift */; };
 		2E713D652E57638A002087EB /* LocationCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D642E57638A002087EB /* LocationCellView.swift */; };
 		2E713D672E576397002087EB /* LocationCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D662E576397002087EB /* LocationCellViewModel.swift */; };
+		2E78D4322E5B701600AE99A4 /* SearchLocationContainerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D42E2E5B701600AE99A4 /* SearchLocationContainerPresenter.swift */; };
+		2E78D4332E5B701600AE99A4 /* SearchLocationContainerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D42D2E5B701600AE99A4 /* SearchLocationContainerModels.swift */; };
+		2E78D4342E5B701600AE99A4 /* SearchLocationContainerRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D42F2E5B701600AE99A4 /* SearchLocationContainerRouter.swift */; };
+		2E78D4362E5B701600AE99A4 /* SearchLocationContainerInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D42C2E5B701600AE99A4 /* SearchLocationContainerInteractor.swift */; };
+		2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D4302E5B701600AE99A4 /* SearchLocationContainerViewController.swift */; };
 		2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C9682E54E82A00320E27 /* StorageService.swift */; };
 		2E96C96C2E54FF6200320E27 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */; };
 		2EDB163F2E53CC330002C812 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */; };
@@ -68,6 +74,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2E2246062E5B9B6100FDA259 /* SearchLocationContainerConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerConfigurator.swift; sourceTree = "<group>"; };
 		2E245C6B2E5316710085B958 /* GeoMemories.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeoMemories.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E245C812E5316720085B958 /* GeoMemoriesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeoMemoriesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E245C8B2E5316720085B958 /* GeoMemoriesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeoMemoriesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -105,9 +112,14 @@
 		2E713D4F2E55F6FB002087EB /* CreateEditEntryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryViewController.swift; sourceTree = "<group>"; };
 		2E713D502E55F6FB002087EB /* CreateEditEntryWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryWorker.swift; sourceTree = "<group>"; };
 		2E713D572E560B52002087EB /* CreateEditEntryConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryConfigurator.swift; sourceTree = "<group>"; };
-		2E713D612E571F52002087EB /* RoundTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundTextField.swift; sourceTree = "<group>"; };
+		2E713D612E571F52002087EB /* RoundedCornersTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCornersTextField.swift; sourceTree = "<group>"; };
 		2E713D642E57638A002087EB /* LocationCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCellView.swift; sourceTree = "<group>"; };
 		2E713D662E576397002087EB /* LocationCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCellViewModel.swift; sourceTree = "<group>"; };
+		2E78D42C2E5B701600AE99A4 /* SearchLocationContainerInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerInteractor.swift; sourceTree = "<group>"; };
+		2E78D42D2E5B701600AE99A4 /* SearchLocationContainerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerModels.swift; sourceTree = "<group>"; };
+		2E78D42E2E5B701600AE99A4 /* SearchLocationContainerPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerPresenter.swift; sourceTree = "<group>"; };
+		2E78D42F2E5B701600AE99A4 /* SearchLocationContainerRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerRouter.swift; sourceTree = "<group>"; };
+		2E78D4302E5B701600AE99A4 /* SearchLocationContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerViewController.swift; sourceTree = "<group>"; };
 		2E96C9682E54E82A00320E27 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
 		2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -290,6 +302,7 @@
 		2E713D4A2E55F6E6002087EB /* CreateEditEntry */ = {
 			isa = PBXGroup;
 			children = (
+				2E78D42B2E5B6FF500AE99A4 /* SearchLocationContainer */,
 				2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */,
 				2E713D4C2E55F6FB002087EB /* CreateEditEntryModels.swift */,
 				2E713D4D2E55F6FB002087EB /* CreateEditEntryPresenter.swift */,
@@ -304,7 +317,7 @@
 		2E713D602E571F37002087EB /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				2E713D612E571F52002087EB /* RoundTextField.swift */,
+				2E713D612E571F52002087EB /* RoundedCornersTextField.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -316,6 +329,19 @@
 				2E713D662E576397002087EB /* LocationCellViewModel.swift */,
 			);
 			path = LocationCell;
+			sourceTree = "<group>";
+		};
+		2E78D42B2E5B6FF500AE99A4 /* SearchLocationContainer */ = {
+			isa = PBXGroup;
+			children = (
+				2E78D4302E5B701600AE99A4 /* SearchLocationContainerViewController.swift */,
+				2E78D42C2E5B701600AE99A4 /* SearchLocationContainerInteractor.swift */,
+				2E78D42E2E5B701600AE99A4 /* SearchLocationContainerPresenter.swift */,
+				2E78D42D2E5B701600AE99A4 /* SearchLocationContainerModels.swift */,
+				2E78D42F2E5B701600AE99A4 /* SearchLocationContainerRouter.swift */,
+				2E2246062E5B9B6100FDA259 /* SearchLocationContainerConfigurator.swift */,
+			);
+			path = SearchLocationContainer;
 			sourceTree = "<group>";
 		};
 		2E96C9672E54E81600320E27 /* Services */ = {
@@ -493,15 +519,21 @@
 				2E713D512E55F6FB002087EB /* CreateEditEntryPresenter.swift in Sources */,
 				2E713D522E55F6FB002087EB /* CreateEditEntryRouter.swift in Sources */,
 				2E713D532E55F6FB002087EB /* CreateEditEntryModels.swift in Sources */,
+				2E2246072E5B9B6100FDA259 /* SearchLocationContainerConfigurator.swift in Sources */,
 				2E713D542E55F6FB002087EB /* CreateEditEntryViewController.swift in Sources */,
 				2E713D552E55F6FB002087EB /* CreateEditEntryWorker.swift in Sources */,
 				2E713D562E55F6FB002087EB /* CreateEditEntryInteractor.swift in Sources */,
 				2E245CFB2E539A630085B958 /* HomeRouter.swift in Sources */,
-				2E713D622E571F52002087EB /* RoundTextField.swift in Sources */,
+				2E713D622E571F52002087EB /* RoundedCornersTextField.swift in Sources */,
 				2E713D652E57638A002087EB /* LocationCellView.swift in Sources */,
 				2E245CFC2E539A630085B958 /* HomeViewController.swift in Sources */,
 				2E245CFD2E539A630085B958 /* HomeModels.swift in Sources */,
 				2E245CFE2E539A630085B958 /* HomePresenter.swift in Sources */,
+				2E78D4322E5B701600AE99A4 /* SearchLocationContainerPresenter.swift in Sources */,
+				2E78D4332E5B701600AE99A4 /* SearchLocationContainerModels.swift in Sources */,
+				2E78D4342E5B701600AE99A4 /* SearchLocationContainerRouter.swift in Sources */,
+				2E78D4362E5B701600AE99A4 /* SearchLocationContainerInteractor.swift in Sources */,
+				2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */,
 				2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */,
 				2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */,
 				2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */,
