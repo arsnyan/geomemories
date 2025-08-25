@@ -101,10 +101,7 @@ class CreateEditEntryViewController: UIViewController {
         return view
     }()
     
-    private let placeholderContainerView: UIView = GradientView(colors: [
-        .black.withAlphaComponent(0.1),
-        .black.withAlphaComponent(0.3)
-    ])
+    private let placeholderContainerView: UIView = UIView()
     
     private let entryDescriptionPlaceholderLabel: UILabel = {
         let label = UILabel()

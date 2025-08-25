@@ -69,6 +69,8 @@ class LocationWorker: NSObject {
     private var lastLocationTimestamp: Date?
     private let cacheValidityDuration: TimeInterval = 5 * 60
     
+    private var isWaitingForAuthorization = false
+    
     init(
         locationManager: LocationManagerProtocol = CLLocationManager(),
         searchCompleter: MKLocalSearchCompleterProtocol = MKLocalSearchCompleter()
@@ -78,7 +80,6 @@ class LocationWorker: NSObject {
         super.init()
         self.locationManager.delegate = self
         self.searchCompleter.delegate = self
-//        self.searchCompleter.resultTypes = .
     }
     
     func getCurrentLocation() -> AnyPublisher<CLLocation, LocationError> {
@@ -90,34 +91,24 @@ class LocationWorker: NSObject {
                 .eraseToAnyPublisher()
         }
         
-        return Future<Void, LocationError> { [weak self] promise in
-            guard let self else { return promise(.failure(.unknown)) }
-            
-            switch self.locationManager.authorizationStatus {
-            case .notDetermined:
-                self.locationManager.requestWhenInUseAuthorization()
-                promise(.success(()))
-            case .restricted, .denied:
-                promise(.failure(.permissionDenied))
-            case .authorizedAlways, .authorizedWhenInUse:
-                promise(.success(()))
-            @unknown default:
-                promise(.failure(.unknown))
-            }
+        isWaitingForAuthorization = true
+        
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            self.locationManager.requestWhenInUseAuthorization()
+        case .restricted, .denied:
+            isWaitingForAuthorization.toggle()
+            return Fail(error: LocationError.permissionDenied).eraseToAnyPublisher()
+        case .authorizedAlways, .authorizedWhenInUse:
+            locationManager.requestLocation()
+        @unknown default:
+            return Fail(error: LocationError.unknown).eraseToAnyPublisher()
         }
-        .flatMap { [weak self] () -> AnyPublisher<CLLocation, LocationError> in
-            guard let self else {
-                return Fail(error: LocationError.unknown).eraseToAnyPublisher()
-            }
-            
-            self.locationManager.requestLocation()
-            
-            return self.locationSubject
-                .mapError { .failedToFetchLocation($0) }
-                .first()
-                .eraseToAnyPublisher()
-        }
-        .eraseToAnyPublisher()
+        
+        return locationSubject
+            .mapError { LocationError.failedToFetchLocation($0) }
+            .first()
+            .eraseToAnyPublisher()
     }
     
     func findLocations(
@@ -155,10 +146,11 @@ extension LocationWorker: CLLocationManagerDelegate {
         switch manager.authorizationStatus {
         case .restricted, .denied:
             locationSubject.send(completion: .failure(LocationError.permissionDenied))
+            isWaitingForAuthorization = false
             lastLocation = nil
             lastLocationTimestamp = nil
         case .authorizedAlways, .authorizedWhenInUse:
-            break
+            locationManager.requestLocation()
         default:
             break
         }
@@ -170,7 +162,8 @@ extension LocationWorker: CLLocationManagerDelegate {
             lastLocationTimestamp = Date()
             
             locationSubject.send(location)
-            locationSubject.send(completion: .finished)
+            
+            isWaitingForAuthorization = false
             
             let region = MKCoordinateRegion(
                 center: location.coordinate,
@@ -183,6 +176,7 @@ extension LocationWorker: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         locationSubject.send(completion: .failure(error))
+        isWaitingForAuthorization = false
     }
 }
 
