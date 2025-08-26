@@ -49,13 +49,7 @@ class HomeRouter: NSObject, HomeRoutingLogic, HomeDataPassing {
         source: HomeViewController,
         destination: CreateEditEntryViewController
     ) {
-//        let navigationController = UINavigationController(rootViewController: destination)
-        
-        let dest = SearchLocationContainerViewController()
-        
-        SearchLocationContainerConfigurator.shared.configure(viewController: dest)
-        
-        let navigationController = UINavigationController(rootViewController: dest)
+        let navigationController = UINavigationController(rootViewController: destination)
         if let sheet = navigationController.sheetPresentationController {
             sheet.detents = [.large()]
             sheet.largestUndimmedDetentIdentifier = .medium

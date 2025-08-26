@@ -36,6 +36,8 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
     private var isCurrentLocationSelected: Bool = false
     
     func provideLocationSearchResults(request: SearchLocationContainer.SearchLocation.Request) {
+        isCurrentLocationSelected = false
+        
         switch request {
         case .cancelled(let userInitiated):
             presenter?.presentLocationSearchResults(
@@ -101,6 +103,7 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
                 return
             }
             
+            isCurrentLocationSelected = false
             presenter?.presentSelectedLocation(
                 response: .successWithSelectedLocation(mapItem: mapItem)
             )

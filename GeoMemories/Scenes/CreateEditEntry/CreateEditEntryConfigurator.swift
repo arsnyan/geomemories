@@ -17,13 +17,9 @@ final class CreateEditEntryConfigurator {
         let interactor = CreateEditEntryInteractor()
         let presenter = CreateEditEntryPresenter()
         let router = CreateEditEntryRouter()
-        
-        let locationWorker = LocationWorker()
-        
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
-        interactor.locationWorker = locationWorker
         presenter.viewController = viewController
         router.viewController = viewController
         router.dataStore = interactor

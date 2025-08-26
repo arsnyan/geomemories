@@ -29,8 +29,10 @@ class SearchLocationContainerViewController: UIViewController {
         didSet {
             resultsTable.reloadData()
             
+            let newTableHeight = locationRows.map(\.height).reduce(0, +)
+            
             resultsTable.snp.updateConstraints { make in
-                make.height.equalTo(locationRows.map(\.height).reduce(0, +))
+                make.height.equalTo(newTableHeight)
             }
             
             UIView.animate(
@@ -39,7 +41,7 @@ class SearchLocationContainerViewController: UIViewController {
                 usingSpringWithDamping: 0.8,
                 initialSpringVelocity: 0
             ) {
-                self.view.layoutIfNeeded()
+                self.parent?.view.layoutIfNeeded()
             } completion: { _ in
                 if self.locationRows.isEmpty {
                     self.container.backgroundColor = .clear
@@ -86,6 +88,7 @@ extension SearchLocationContainerViewController: SearchLocationContainerDisplayL
     
     func displaySelectedLocation(viewModel: SearchLocationContainer.ChooseLocation.ViewModel) {
         endEditingUserInitiated = false
+        locationRows = []
         searchTextField.resignFirstResponder()
         
         switch viewModel {
@@ -155,8 +158,13 @@ private extension SearchLocationContainerViewController {
             searchTextField.layer.shadowOpacity = 0.1
         }
         
-        let icon = UIImage(systemName: "magnifyingglass")
-        searchTextField.leftView = UIImageView(image: icon)
+        let icon = UIImage(systemName: "mappin.and.ellipse")
+        let imageView = UIImageView(image: icon)
+        imageView.contentMode = .scaleAspectFit
+        imageView.snp.makeConstraints { make in
+            make.width.equalTo(24)
+        }
+        searchTextField.leftView = imageView
         searchTextField.leftView?.tintColor = .systemGray
         searchTextField.leftViewMode = .always
         
@@ -209,16 +217,12 @@ private extension SearchLocationContainerViewController {
         
         resultsTable.snp.makeConstraints { make in
             make.top.equalTo(searchBarStack.snp.bottom)
-            make.leading.trailing.equalToSuperview()
+            make.leading.trailing.bottom.equalToSuperview()
             make.height.equalTo(0)
         }
         
         container.snp.makeConstraints { make in
-            // TODO: - Remove that as this should be done in parent view
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
-            // TODO: - But not this
-            make.bottom.equalTo(resultsTable.snp.bottom)
+            make.edges.equalToSuperview()
         }
     }
 }
@@ -293,7 +297,8 @@ extension SearchLocationContainerViewController: UITextFieldDelegate {
         // I decided I want the text field to empty any time the user click on it
         // as an intent of making a new search, so that they don't need to do it
         // manually all the time
-        textField.text = nil
+        setTextAnimated(nil)
+        locationRows = []
     }
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
