@@ -30,6 +30,7 @@ class CreateEditEntryViewController: UIViewController {
     private var entryDescriptionTextView: UITextView!
     
     private var mediaContainer: MediaContainerViewController!
+    private var mediaContainerHeightConstraint: Constraint?
     
     // MARK: View lifecycle
     override func viewDidLoad() {
@@ -197,12 +198,14 @@ private extension CreateEditEntryViewController {
     
     func setupMediaContainer() {
         mediaContainer = MediaContainerViewController()
+        mediaContainer.delegate = self
         addChild(mediaContainer)
         view.addSubview(mediaContainer.view)
         
         mediaContainer.view.snp.makeConstraints { make in
             make.top.equalTo(entryDescriptionContainer.snp.bottom).offset(16)
-            make.leading.bottom.trailing.equalToSuperview().inset(16)
+            make.leading.trailing.equalToSuperview().inset(16)
+            mediaContainerHeightConstraint = make.height.equalTo(0).constraint
         }
         mediaContainer.didMove(toParent: self)
     }
@@ -231,6 +234,16 @@ extension CreateEditEntryViewController: UITextFieldDelegate {
             entryDescriptionTextView.becomeFirstResponder()
         }
         return true
+    }
+}
+
+extension CreateEditEntryViewController: MediaContainerViewControllerDelegate {
+    func updateContentHeight(_ height: CGFloat) {
+        mediaContainerHeightConstraint?.update(offset: height)
+        
+        UIView.animate(withDuration: 0.25) { [unowned self] in
+            view.layoutIfNeeded()
+        }
     }
 }
 

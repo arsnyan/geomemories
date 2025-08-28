@@ -9,11 +9,16 @@ import UIKit
 import SnapKit
 import PhotosUI
 
+protocol MediaContainerViewControllerDelegate: AnyObject {
+    func updateContentHeight(_ height: CGFloat)
+}
+
 class MediaContainerViewController: UIViewController {
     private let cellIdentifier = "MediaCell"
     
-    // Debug values only
-    private var items: [MediaEntry?] = [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+    weak var delegate: MediaContainerViewControllerDelegate?
+    
+    private var items: [MediaEntry] = []
     private let itemsPerRow = 5
     private let spacing = 8
     
@@ -170,6 +175,8 @@ private extension MediaContainerViewController {
         let totalHeight = heightWithoutSpacing + (max(0, numberOfRows - 1) * CGFloat(spacing))
         
         collectionViewHeightConstraint?.update(offset: totalHeight)
+        
+        delegate?.updateContentHeight(totalHeight)
     }
 }
 
