@@ -53,6 +53,7 @@
 		2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D4302E5B701600AE99A4 /* SearchLocationContainerViewController.swift */; };
 		2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C9682E54E82A00320E27 /* StorageService.swift */; };
 		2E96C96C2E54FF6200320E27 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */; };
+		2ED101382E60AEE60078AFE6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED101372E60AEE60078AFE6 /* Constants.swift */; };
 		2ED93D812E5DFE2C00115576 /* MediaContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */; };
 		2EDB163F2E53CC330002C812 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
@@ -123,6 +124,7 @@
 		2E78D4302E5B701600AE99A4 /* SearchLocationContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerViewController.swift; sourceTree = "<group>"; };
 		2E96C9682E54E82A00320E27 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
+		2ED101372E60AEE60078AFE6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContainerViewController.swift; sourceTree = "<group>"; };
 		2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,6 +181,7 @@
 		2E245CA52E5317900085B958 /* GeoMemories */ = {
 			isa = PBXGroup;
 			children = (
+				2ED101362E60AED60078AFE6 /* Styles */,
 				2E713D602E571F37002087EB /* Views */,
 				2E96C9672E54E81600320E27 /* Services */,
 				2E245CF22E539A490085B958 /* Scenes */,
@@ -363,6 +366,14 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		2ED101362E60AED60078AFE6 /* Styles */ = {
+			isa = PBXGroup;
+			children = (
+				2ED101372E60AEE60078AFE6 /* Constants.swift */,
+			);
+			path = Styles;
+			sourceTree = "<group>";
+		};
 		2ED93D7F2E5DFE1B00115576 /* MediaContainer */ = {
 			isa = PBXGroup;
 			children = (
@@ -544,6 +555,7 @@
 				2E78D4332E5B701600AE99A4 /* SearchLocationContainerModels.swift in Sources */,
 				2E78D4342E5B701600AE99A4 /* SearchLocationContainerRouter.swift in Sources */,
 				2E78D4362E5B701600AE99A4 /* SearchLocationContainerInteractor.swift in Sources */,
+				2ED101382E60AEE60078AFE6 /* Constants.swift in Sources */,
 				2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */,
 				2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */,
 				2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */,

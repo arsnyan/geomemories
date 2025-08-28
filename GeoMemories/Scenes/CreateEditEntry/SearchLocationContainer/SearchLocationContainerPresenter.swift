@@ -89,19 +89,18 @@ class SearchLocationContainerPresenter: SearchLocationContainerPresentationLogic
             } else {
                 if let postalAddress = mapItem.placemark.postalAddress {
                     let formatter = CNPostalAddressFormatter()
-                    description = formatter.string(from: postalAddress)
+                    description = formatter.string(from: postalAddress).replacingOccurrences(of: "\n", with: ", ")
+                } else {
+                    let placemark = mapItem.placemark
+                    let addressParts = [
+                        placemark.name, placemark.thoroughfare,
+                        placemark.subThoroughfare, placemark.locality,
+                        placemark.subAdministrativeArea, placemark.administrativeArea,
+                        placemark.postalCode, placemark.country
+                    ]
                     
-                    return
+                    description = addressParts.compactMap(\.self).joined(separator: ", ")
                 }
-                let placemark = mapItem.placemark
-                let addressParts = [
-                    placemark.name, placemark.thoroughfare,
-                    placemark.subThoroughfare, placemark.locality,
-                    placemark.subAdministrativeArea, placemark.administrativeArea,
-                    placemark.postalCode, placemark.country
-                ]
-                
-                description = addressParts.compactMap(\.self).joined(separator: ", ")
             }
             
             viewController?.displaySelectedLocation(

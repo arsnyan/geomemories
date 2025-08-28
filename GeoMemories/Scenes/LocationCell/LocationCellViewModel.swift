@@ -39,7 +39,7 @@ struct LocationCellViewModel: LocationCellViewModelProtocol {
         } else {
             if let postalAddress = mapItem.placemark.postalAddress {
                 let formatter = CNPostalAddressFormatter()
-                description = formatter.string(from: postalAddress)
+                description = formatter.string(from: postalAddress).replacingOccurrences(of: "\n", with: ", ")
             } else {
                 let placemark = mapItem.placemark
                 let addressParts = [

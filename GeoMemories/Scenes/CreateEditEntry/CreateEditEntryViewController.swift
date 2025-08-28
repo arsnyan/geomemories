@@ -65,6 +65,7 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
 private extension CreateEditEntryViewController {
     func setupUI() {
         interactor?.provideNavigationBarTitle()
+        view.backgroundColor = .systemBackground
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .cancel,
@@ -103,7 +104,7 @@ private extension CreateEditEntryViewController {
         entryTitleTextField = RoundedCornersTextField()
         entryTitleTextField.placeholder = String(localized: "geoEntryTitleTextFieldPlaceholder")
         entryTitleTextField.backgroundColor = .systemGray6
-        entryTitleTextField.layer.cornerRadius = 22
+        entryTitleTextField.layer.cornerRadius = Constants.cornerRadius
         entryTitleTextField.clearButtonMode = .whileEditing
         entryTitleTextField.returnKeyType = .next
         entryTitleTextField.delegate = self
@@ -183,7 +184,7 @@ private extension CreateEditEntryViewController {
         entryDescriptionContainer.alignment = .fill
         entryDescriptionContainer.distribution = .fill
         entryDescriptionContainer.backgroundColor = .systemGray6
-        entryDescriptionContainer.layer.cornerRadius = 22
+        entryDescriptionContainer.layer.cornerRadius = Constants.cornerRadius
         entryDescriptionContainer.layer.masksToBounds = true
         
         view.addSubview(entryDescriptionContainer)

@@ -22,6 +22,7 @@ class LocationCellView: UITableViewCell {
     
     private func updateView() {
         guard let viewModel else { return }
+        
         var content = defaultContentConfiguration()
         content.text = viewModel.description
         backgroundColor = .clear

@@ -119,7 +119,7 @@ private extension SearchLocationContainerViewController {
             config = .glass()
         } else {
             config = .tinted()
-            config.cornerStyle = .capsule
+            config.cornerStyle = Constants.buttonCornerStyle
         }
         config.image = UIImage(systemName: "location.fill")
         config.buttonSize = .mini
@@ -146,7 +146,7 @@ private extension SearchLocationContainerViewController {
         searchTextField.placeholder = String(localized: "locationSearchFieldPlaceholder")
         searchTextField.clearButtonMode = .whileEditing
         searchTextField.returnKeyType = .search
-        searchTextField.layer.cornerRadius = 22
+        searchTextField.layer.cornerRadius = Constants.cornerRadius
         
         if #available(iOS 26.0, *) {
             searchTextField.backgroundColor = .systemGray6
@@ -207,7 +207,7 @@ private extension SearchLocationContainerViewController {
         container = UIView()
         container.addSubview(searchBarStack)
         container.addSubview(resultsTable)
-        container.layer.cornerRadius = 22
+        container.layer.cornerRadius = Constants.cornerRadius
         view.addSubview(container)
         
         searchBarStack.snp.makeConstraints { make in

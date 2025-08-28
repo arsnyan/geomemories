@@ -73,7 +73,7 @@ private extension MediaContainerViewController {
         config.image = UIImage(systemName: "plus")
         config.imagePlacement = .top
         config.imagePadding = 4
-        config.cornerStyle = .large
+        config.cornerStyle = Constants.buttonCornerStyle
         config.contentInsets = .init(
             top: 16,
             leading: 16,
@@ -94,7 +94,7 @@ private extension MediaContainerViewController {
         config.image = UIImage(systemName: "camera")
         config.imagePlacement = .top
         config.imagePadding = 4
-        config.cornerStyle = .large
+        config.cornerStyle = Constants.buttonCornerStyle
         config.contentInsets = .init(
             top: 16,
             leading: 16,
