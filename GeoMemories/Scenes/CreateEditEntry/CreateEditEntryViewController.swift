@@ -80,6 +80,7 @@ private extension CreateEditEntryViewController {
         setupSearchLocationContainer()
         setupTitleTextField()
         setupDescriptionContainer()
+        setupMediaContainer()
     }
     
     func setupSearchLocationContainer() {
@@ -201,7 +202,7 @@ private extension CreateEditEntryViewController {
         
         mediaContainer.view.snp.makeConstraints { make in
             make.top.equalTo(entryDescriptionContainer.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(16)
+            make.leading.bottom.trailing.equalToSuperview().inset(16)
         }
         mediaContainer.didMove(toParent: self)
     }
