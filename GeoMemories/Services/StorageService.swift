@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import CoreStore
 import CoreData
+import CoreLocation
 
 enum StorageServiceError: LocalizedError {
     case noDataStack
@@ -44,63 +45,34 @@ protocol DataStackProtocol {
 extension DataStack: DataStackProtocol {}
 
 protocol GeoEntryValidatorProtocol {
-    func validate(_ entry: GeoEntry) throws(StorageServiceError)
+    func validate(
+        title: String,
+        latitude: Double,
+        longitude: Double
+    ) throws(StorageServiceError)
 }
 
 class GeoEntryValidator: GeoEntryValidatorProtocol {
-    func validate(_ entry: GeoEntry) throws(StorageServiceError) {
-        guard !entry.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+    func validate(
+        title: String,
+        latitude: Double,
+        longitude: Double
+    ) throws(StorageServiceError) {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw .invalidInput("Title cannot be empty")
         }
         
-        guard entry.latitude >= -90 && entry.latitude <= 90 else {
+        guard latitude >= -90 && latitude <= 90 else {
             throw .invalidInput(
                 "Latitude must be between -90 and 90 degrees"
             )
         }
         
-        guard entry.longitude >= -180 && entry.longitude <= 180 else {
+        guard longitude >= -180 && longitude <= 180 else {
             throw .invalidInput(
                 "Longitude must be between -180 and 180 degrees"
             )
         }
-    }
-}
-
-protocol GeoEntryMapperProtocol {
-    func map(
-        _ entry: GeoEntry,
-        to coreDataEntry: GeoEntry,
-        in transaction: AsynchronousDataTransaction
-    )
-    
-    func create(
-        from entry: GeoEntry,
-        in transaction: AsynchronousDataTransaction
-    ) -> GeoEntry
-}
-
-class GeoEntryMapper: GeoEntryMapperProtocol {
-    func map(
-        _ entry: GeoEntry,
-        to coreDataEntry: GeoEntry,
-        in transaction: AsynchronousDataTransaction
-    ) {
-        coreDataEntry.id = entry.id
-        coreDataEntry.title = entry.title
-        coreDataEntry.description = entry.description
-        coreDataEntry.latitude = entry.latitude
-        coreDataEntry.longitude = entry.longitude
-        coreDataEntry.mediaIds = entry.mediaIds
-    }
-    
-    func create(
-        from entry: GeoEntry,
-        in transaction: AsynchronousDataTransaction
-    ) -> GeoEntry {
-        let geoEntry = transaction.create(Into<GeoEntry>())
-        map(entry, to: geoEntry, in: transaction)
-        return geoEntry
     }
 }
 
@@ -125,31 +97,61 @@ class QueryBuilder: QueryBuilderProtocol {
 }
 
 protocol StorageServiceProtocol {
-    func addGeoEntry(_ entry: GeoEntry) -> AnyPublisher<GeoEntry, StorageServiceError>
+    // MARK: - StorageServiceProtocol — GeoEntries
+    func addGeoEntry(
+        withTitle title: String,
+        description: String,
+        at coord: CLLocationCoordinate2D,
+        withMedia media: Set<MediaEntry>
+    ) -> AnyPublisher<GeoEntry, StorageServiceError>
     func getGeoEntries() -> AnyPublisher<[GeoEntry], StorageServiceError>
-    func updateGeoEntry(_ entry: GeoEntry) -> AnyPublisher<GeoEntry, StorageServiceError>
-    func deleteGeoEntry(_ entry: GeoEntry) -> AnyPublisher<Void, StorageServiceError>
+    func updateGeoEntry(
+        _ entry: GeoEntry
+    ) -> AnyPublisher<GeoEntry, StorageServiceError>
+    func deleteGeoEntry(
+        _ entry: GeoEntry
+    ) -> AnyPublisher<Void, StorageServiceError>
+    
+    // MARK: - StorageServiceProtocol — MediaEntries
+    func addMediaEntry(
+        of type: MediaType,
+        withPath path: String,
+        for entry: GeoEntry?
+    ) -> AnyPublisher<MediaEntry, StorageServiceError>
+    func updateMediaEntry(
+        _ entry: MediaEntry,
+        toLinkWith geoEntry: GeoEntry
+    ) -> AnyPublisher<MediaEntry, StorageServiceError>
+    func deleteMediaEntry(
+        _ entry: MediaEntry
+    ) -> AnyPublisher<Void, StorageServiceError>
 }
 
+// MARK: - StorageService
 class StorageService: StorageServiceProtocol {
+    // MARK: - Dependencies
     private let dataStack: DataStackProtocol
     private let validator: GeoEntryValidatorProtocol
-    private let mapper: GeoEntryMapperProtocol
     private let queryBuilder: QueryBuilderProtocol
     
     init(
         dataStack: DataStackProtocol = CoreStoreDefaults.dataStack,
         validator: GeoEntryValidatorProtocol = GeoEntryValidator(),
-        mapper: GeoEntryMapperProtocol = GeoEntryMapper(),
         queryBuilder: QueryBuilderProtocol = QueryBuilder()
     ) {
         self.dataStack = dataStack
         self.validator = validator
-        self.mapper = mapper
         self.queryBuilder = queryBuilder
     }
     
-    func addGeoEntry(_ entry: GeoEntry) -> AnyPublisher<GeoEntry, StorageServiceError> {
+    // MARK: - CRUD — Geo Entries
+    
+    func addGeoEntry(
+        withTitle title: String,
+        description: String = "",
+        at coord: CLLocationCoordinate2D,
+        withMedia media: Set<MediaEntry> = []
+    ) -> AnyPublisher<GeoEntry, StorageServiceError> {
         Future<GeoEntry, StorageServiceError> { [weak self] promise in
             guard let self else {
                 promise(.failure(.noDataStack))
@@ -157,7 +159,11 @@ class StorageService: StorageServiceProtocol {
             }
             
             do {
-                try validator.validate(entry)
+                try validator.validate(
+                    title: title,
+                    latitude: coord.latitude,
+                    longitude: coord.longitude
+                )
             } catch {
                 // swiftlint:disable force_cast
                 promise(.failure(error as! StorageServiceError))
@@ -165,7 +171,13 @@ class StorageService: StorageServiceProtocol {
             
             dataStack.perform(
                 asynchronous: { transaction in
-                    return self.mapper.create(from: entry, in: transaction)
+                    let geoEntry = transaction.create(Into<GeoEntry>())
+                    geoEntry.title = title
+                    geoEntry.description = description
+                    geoEntry.latitude = coord.latitude
+                    geoEntry.longitude = coord.longitude
+                    geoEntry.mediaIds = media
+                    return geoEntry
                 },
                 sourceIdentifier: nil,
                 success: { geoEntry in
@@ -210,7 +222,11 @@ class StorageService: StorageServiceProtocol {
             }
             
             do {
-                try validator.validate(entry)
+                try validator.validate(
+                    title: entry.title,
+                    latitude: entry.latitude,
+                    longitude: entry.longitude
+                )
             } catch {
                 // swiftlint:disable force_cast
                 promise(.failure(error as! StorageServiceError))
@@ -223,8 +239,11 @@ class StorageService: StorageServiceProtocol {
                     ) else {
                         throw StorageServiceError.notFound
                     }
-                    
-                    self.mapper.map(entry, to: existing, in: transaction)
+                    existing.title = entry.title
+                    existing.description = entry.description
+                    existing.latitude = entry.latitude
+                    existing.longitude = entry.longitude
+                    existing.mediaIds = entry.mediaIds
                     return existing
                 },
                 sourceIdentifier: nil,
@@ -250,6 +269,98 @@ class StorageService: StorageServiceProtocol {
                 asynchronous: { transaction in
                     try transaction.deleteAll(
                         self.queryBuilder.deleteByIdQuery(entry.id)
+                    )
+                },
+                sourceIdentifier: nil,
+                success: { done in
+                    promise(.success(done))
+                },
+                failure: { error in
+                    promise(.failure(.coreStoreError(error)))
+                }
+            )
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    // MARK: - CRUD — Media Entries
+    
+    func addMediaEntry(
+        of type: MediaType,
+        withPath path: String,
+        for entry: GeoEntry? = nil
+    ) -> AnyPublisher<MediaEntry, StorageServiceError> {
+        Future<MediaEntry, StorageServiceError> { [weak self] promise in
+            guard let self else {
+                promise(.failure(.noDataStack))
+                return
+            }
+            
+            dataStack.perform(
+                asynchronous: { transaction in
+                    let mediaEntry = transaction.create(Into<MediaEntry>())
+                    mediaEntry.linkedGeoEntry = entry
+                    mediaEntry.mediaPath = path
+                    mediaEntry.mediaType = type.rawValue
+                    return mediaEntry
+                },
+                sourceIdentifier: nil,
+                success: { mediaEntry in
+                    promise(.success(mediaEntry))
+                },
+                failure: { error in
+                    promise(.failure(.coreStoreError(error)))
+                }
+            )
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func updateMediaEntry(
+        _ entry: MediaEntry,
+        toLinkWith geoEntry: GeoEntry
+    ) -> AnyPublisher<MediaEntry, StorageServiceError> {
+        Future<MediaEntry, StorageServiceError> { [weak self] promise in
+            guard let self else {
+                promise(.failure(.noDataStack))
+                return
+            }
+            
+            dataStack.perform(
+                asynchronous: { transaction in
+                    guard let existing = try transaction.fetchOne(
+                        From<MediaEntry>()
+                            .where(\.$mediaPath == entry.mediaPath)
+                    ) else {
+                        throw StorageServiceError.notFound
+                    }
+                    existing.linkedGeoEntry = geoEntry
+                    return existing
+                },
+                sourceIdentifier: nil,
+                success: { updated in
+                    promise(.success(updated))
+                },
+                failure: { error in
+                    promise(.failure(.coreStoreError(error)))
+                }
+            )
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func deleteMediaEntry(_ entry: MediaEntry) -> AnyPublisher<Void, StorageServiceError> {
+        Future<Void, StorageServiceError> { [weak self] promise in
+            guard let self else {
+                promise(.failure(.noDataStack))
+                return
+            }
+            
+            dataStack.perform(
+                asynchronous: { transaction in
+                    try transaction.deleteAll(
+                        From<MediaEntry>()
+                            .where(\.$mediaPath == entry.mediaPath)
                     )
                 },
                 sourceIdentifier: nil,
