@@ -13,7 +13,6 @@
 import UIKit
 
 @objc protocol SearchLocationContainerRoutingLogic {
-    //func routeToSomewhere(segue: UIStoryboardSegue?)
 }
 
 protocol SearchLocationContainerDataPassing {

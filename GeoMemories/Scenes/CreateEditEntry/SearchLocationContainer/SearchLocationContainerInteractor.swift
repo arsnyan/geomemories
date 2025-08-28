@@ -35,7 +35,9 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
     
     private var isCurrentLocationSelected: Bool = false
     
-    func provideLocationSearchResults(request: SearchLocationContainer.SearchLocation.Request) {
+    func provideLocationSearchResults(
+        request: SearchLocationContainer.SearchLocation.Request
+    ) {
         isCurrentLocationSelected = false
         
         switch request {

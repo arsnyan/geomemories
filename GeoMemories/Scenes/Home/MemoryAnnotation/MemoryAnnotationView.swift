@@ -15,6 +15,7 @@ class MemoryAnnotationView: MKMarkerAnnotationView {
         didSet {
             guard let memoryAnnotation = annotation as? MemoryAnnotation else { return }
             
+            // swiftlint:disable line_length
             // TODO: - really would rather make a custom clustering image — https://medium.com/mobilepeople/enhance-your-map-experience-with-annotations-13e28507f892
             clusteringIdentifier = "memories"
             

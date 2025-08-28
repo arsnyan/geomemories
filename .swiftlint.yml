@@ -1,3 +1,4 @@
 disabled_rules:
   - trailing_whitespace
   - blanket_disable_command
+  - function_body_length
