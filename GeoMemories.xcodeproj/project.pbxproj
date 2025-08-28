@@ -54,6 +54,8 @@
 		2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C9682E54E82A00320E27 /* StorageService.swift */; };
 		2E96C96C2E54FF6200320E27 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */; };
 		2ED101382E60AEE60078AFE6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED101372E60AEE60078AFE6 /* Constants.swift */; };
+		2ED1013A2E60DF330078AFE6 /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED101392E60DF330078AFE6 /* FileService.swift */; };
+		2ED1013C2E60EA980078AFE6 /* Dependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED1013B2E60EA980078AFE6 /* Dependencies.swift */; };
 		2ED93D812E5DFE2C00115576 /* MediaContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */; };
 		2EDB163F2E53CC330002C812 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
@@ -125,6 +127,8 @@
 		2E96C9682E54E82A00320E27 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		2E96C96B2E54FF6200320E27 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
 		2ED101372E60AEE60078AFE6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		2ED101392E60DF330078AFE6 /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
+		2ED1013B2E60EA980078AFE6 /* Dependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dependencies.swift; sourceTree = "<group>"; };
 		2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContainerViewController.swift; sourceTree = "<group>"; };
 		2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -354,6 +358,8 @@
 			isa = PBXGroup;
 			children = (
 				2E96C9682E54E82A00320E27 /* StorageService.swift */,
+				2ED101392E60DF330078AFE6 /* FileService.swift */,
+				2ED1013B2E60EA980078AFE6 /* Dependencies.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -539,6 +545,7 @@
 				2E713D672E576397002087EB /* LocationCellViewModel.swift in Sources */,
 				2E713D472E55CCC8002087EB /* MemoryAnnotation.swift in Sources */,
 				2E713D512E55F6FB002087EB /* CreateEditEntryPresenter.swift in Sources */,
+				2ED1013A2E60DF330078AFE6 /* FileService.swift in Sources */,
 				2E713D522E55F6FB002087EB /* CreateEditEntryRouter.swift in Sources */,
 				2E713D532E55F6FB002087EB /* CreateEditEntryModels.swift in Sources */,
 				2E2246072E5B9B6100FDA259 /* SearchLocationContainerConfigurator.swift in Sources */,
@@ -559,6 +566,7 @@
 				2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */,
 				2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */,
 				2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */,
+				2ED1013C2E60EA980078AFE6 /* Dependencies.swift in Sources */,
 				2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */,
 				2ED93D812E5DFE2C00115576 /* MediaContainerViewController.swift in Sources */,
 				2E245D012E539ABD0085B958 /* HomeConfigurator.swift in Sources */,

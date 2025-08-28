@@ -35,7 +35,7 @@ class HomeInteractor: HomeBusinessLogic, HomeDataStore {
     
     init(
         locationWorker: LocationWorker = LocationWorker(),
-        storageService: StorageServiceProtocol = StorageService()
+        storageService: StorageServiceProtocol = Dependencies.storageService
     ) {
         self.locationWorker = locationWorker
         self.storageService = storageService
