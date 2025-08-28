@@ -91,7 +91,15 @@ private extension HomeViewController {
         if #available(iOS 26.0, *) {
             toolbarItems = [.flexibleSpace(), addItem, .fixedSpace(), locationPinItem]
         } else {
-            toolbarItems = [.flexibleSpace(), addItem, locationPinItem]
+            toolbarItems = [.flexibleSpace(), addItem, .fixedSpace(16), locationPinItem]
+            
+            if let toolbar = navigationController?.toolbar {
+                let appearance = UIToolbarAppearance()
+                appearance.configureWithDefaultBackground()
+                appearance.backgroundEffect = UIBlurEffect(style: .systemMaterial)
+                toolbar.standardAppearance = appearance
+                toolbar.scrollEdgeAppearance = appearance
+            }
         }
         navigationController?.setToolbarHidden(false, animated: false)
     }
