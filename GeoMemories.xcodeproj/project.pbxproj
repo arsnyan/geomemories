@@ -58,6 +58,7 @@
 		2ED1013C2E60EA980078AFE6 /* Dependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED1013B2E60EA980078AFE6 /* Dependencies.swift */; };
 		2ED93D812E5DFE2C00115576 /* MediaContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */; };
 		2EDB163F2E53CC330002C812 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */; };
+		2EE3D9352E637BD800240D3D /* MediaPlaceholderViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE3D9342E637BD800240D3D /* MediaPlaceholderViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,6 +132,7 @@
 		2ED1013B2E60EA980078AFE6 /* Dependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dependencies.swift; sourceTree = "<group>"; };
 		2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaContainerViewController.swift; sourceTree = "<group>"; };
 		2EDB163E2E53CC330002C812 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		2EE3D9342E637BD800240D3D /* MediaPlaceholderViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlaceholderViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -314,11 +316,11 @@
 			children = (
 				2ED93D7F2E5DFE1B00115576 /* MediaContainer */,
 				2E78D42B2E5B6FF500AE99A4 /* SearchLocationContainer */,
+				2E713D4F2E55F6FB002087EB /* CreateEditEntryViewController.swift */,
 				2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */,
 				2E713D4C2E55F6FB002087EB /* CreateEditEntryModels.swift */,
 				2E713D4D2E55F6FB002087EB /* CreateEditEntryPresenter.swift */,
 				2E713D4E2E55F6FB002087EB /* CreateEditEntryRouter.swift */,
-				2E713D4F2E55F6FB002087EB /* CreateEditEntryViewController.swift */,
 				2E713D502E55F6FB002087EB /* CreateEditEntryWorker.swift */,
 				2E713D572E560B52002087EB /* CreateEditEntryConfigurator.swift */,
 			);
@@ -384,6 +386,7 @@
 			isa = PBXGroup;
 			children = (
 				2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */,
+				2EE3D9342E637BD800240D3D /* MediaPlaceholderViewCell.swift */,
 			);
 			path = MediaContainer;
 			sourceTree = "<group>";
@@ -541,6 +544,7 @@
 				2E245CD02E5338CF0085B958 /* LocationWorker.swift in Sources */,
 				2E713D582E560B52002087EB /* CreateEditEntryConfigurator.swift in Sources */,
 				2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */,
+				2EE3D9352E637BD800240D3D /* MediaPlaceholderViewCell.swift in Sources */,
 				2E245CFA2E539A630085B958 /* HomeInteractor.swift in Sources */,
 				2E713D672E576397002087EB /* LocationCellViewModel.swift in Sources */,
 				2E713D472E55CCC8002087EB /* MemoryAnnotation.swift in Sources */,

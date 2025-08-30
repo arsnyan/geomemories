@@ -20,5 +20,5 @@ class MediaEntry: CoreStoreObject {
     var mediaPath: String = ""
     
     @Field.Stored("media_type")
-    var mediaType: Int = MediaType.image.rawValue
+    var mediaType: Int = 0
 }

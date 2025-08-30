@@ -10,6 +10,7 @@ import UIKit
 import PhotosUI
 import Combine
 import AVFoundation
+import CoreStore
 
 enum MediaFileWorkerError: LocalizedError {
     case storageServiceError(error: StorageServiceError)
@@ -35,7 +36,14 @@ enum MediaFileWorkerError: LocalizedError {
 }
 
 protocol MediaFileWorkerProtocol {
+    func loadMediaPlaceholder(
+        from mediaEntry: MediaEntry
+    ) -> AnyPublisher<UIImage, MediaFileWorkerError>
     
+    func saveMedia(
+        forEntry geoEntry: GeoEntry?,
+        result: PHPickerResult
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError>
 }
 
 final class MediaFileWorker: MediaFileWorkerProtocol {
@@ -53,26 +61,24 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
     func loadMediaPlaceholder(
         from mediaEntry: MediaEntry
     ) -> AnyPublisher<UIImage, MediaFileWorkerError> {
-        if let image = placeholderCache.object(
-            forKey: NSString(string: mediaEntry.mediaPath)
-        ) {
-            return Just(image)
-                .setFailureType(to: MediaFileWorkerError.self)
-                .eraseToAnyPublisher()
-        }
-        
-        return Future<UIImage, MediaFileWorkerError> { [weak self] promise in
+        return CoreStoreDefaults.dataStack.reactive.perform { [weak self] transaction -> UIImage in
             guard let self else {
-                promise(.failure(.noSelfFound))
-                return
+                throw MediaFileWorkerError.noSelfFound
             }
             
-            let path = getDocumentsDirectory().appending(path: mediaEntry.mediaPath, directoryHint: .notDirectory)
+            let mediaEntry = transaction.fetchExisting(mediaEntry)!
+            
+            if let image = placeholderCache.object(
+                forKey: NSString(string: mediaEntry.mediaPath)
+            ) {
+                return image
+            }
+            
+            let path = getDocumentsDirectory(appending: mediaEntry.mediaPath)
             
             if mediaEntry.mediaType == MediaType.image.rawValue {
                 guard let image = UIImage(contentsOfFile: path.path()) else {
-                    promise(.failure(.readingError(error: nil)))
-                    return
+                    throw MediaFileWorkerError.readingError(error: nil)
                 }
                 
                 placeholderCache.setObject(
@@ -80,7 +86,7 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
                     forKey: NSString(string: mediaEntry.mediaPath)
                 )
                 
-                promise(.success(image))
+                return image
             } else if mediaEntry.mediaType == MediaType.video.rawValue {
                 let asset = AVURLAsset(url: path)
                 let generator = AVAssetImageGenerator(asset: asset)
@@ -97,14 +103,15 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
                         forKey: NSString(string: mediaEntry.mediaPath)
                     )
                     
-                    promise(.success(image))
+                    return image
                 } catch {
-                    promise(.failure(.readingError(error: error)))
+                    throw MediaFileWorkerError.readingError(error: error)
                 }
             } else {
-                promise(.failure(.unsupportedFormat))
+                throw MediaFileWorkerError.unsupportedFormat
             }
         }
+        .mapError({ .storageServiceError(error: .coreStoreError($0)) })
         .eraseToAnyPublisher()
     }
     
@@ -112,90 +119,117 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
         forEntry geoEntry: GeoEntry? = nil,
         result: PHPickerResult
     ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
-        return Future<MediaEntry, MediaFileWorkerError> { promise in
-            let provider = result.itemProvider
-            if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
-                provider.loadFileRepresentation(
-                    forTypeIdentifier: UTType.movie.identifier
-                ) { [weak self] url, error in
-                    guard let self else { return }
-                    
-                    if let url {
-                        let fileName = UUID().uuidString + ".mov"
-                        let destinationURL = getDocumentsDirectory().appending(
-                            path: fileName,
-                            directoryHint: .notDirectory
-                        )
-                        
-                        do {
-                            try FileManager.default.copyItem(at: url, to: destinationURL)
-                        } catch {
-                            promise(.failure(.copyError(error: error)))
-                        }
-                        
-                        storageService.addMediaEntry(
-                            of: .video,
-                            withPath: fileName,
-                            for: geoEntry
-                        )
-                        .mapError { MediaFileWorkerError.storageServiceError(error: $0) }
-                        .sink(
-                            receiveCompletion: { completion in
-                                if case let .failure(error) = completion {
-                                    promise(.failure(error))
-                                }
-                            },
-                            receiveValue: { mediaEntry in
-                                promise(.success(mediaEntry))
-                            }
-                        )
-                        .store(in: &cancellables)
-                    } else {
-                        logger.error("\(error)")
-                    }
+        let provider = result.itemProvider
+        
+        if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+            return saveVideo(forGeoEntry: geoEntry, provider: provider)
+                .eraseToAnyPublisher()
+        } else if provider.canLoadObject(ofClass: UIImage.self) {
+            return saveImage(forGeoEntry: geoEntry, provider: provider)
+                .eraseToAnyPublisher()
+        } else {
+            logger.error("\(MediaFileWorkerError.unsupportedFormat.errorDescription)")
+            return Fail(error: MediaFileWorkerError.unsupportedFormat)
+                .eraseToAnyPublisher()
+        }
+    }
+    
+    private func saveVideo(
+        forGeoEntry geoEntry: GeoEntry? = nil,
+        provider: NSItemProvider
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
+        return Future { promise in
+            provider.loadFileRepresentation(
+                forTypeIdentifier: UTType.movie.identifier
+            ) { [weak self] url, error in
+                guard let self,
+                      let url,
+                      error == nil else {
+                    promise(.failure(.readingError(error: error)))
+                    return
                 }
-            } else if provider.canLoadObject(ofClass: UIImage.self) {
-                provider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
-                    guard let self else { return }
-                    
-                    if let image = image as? UIImage {
-                        let imageName = UUID().uuidString + ".jpg"
-                        let imagePath = getDocumentsDirectory().appending(
-                            path: imageName,
-                            directoryHint: .notDirectory
-                        )
-                        if let jpegData = image.jpegData(compressionQuality: 0.95) {
-                            try? jpegData.write(to: imagePath)
-                            
-                            storageService.addMediaEntry(
-                                of: .image,
-                                withPath: imagePath.absoluteString,
-                                for: geoEntry
-                            )
-                            .mapError({ MediaFileWorkerError.storageServiceError(error: $0) })
-                            .sink(
-                                receiveCompletion: { completion in
-                                    if case let .failure(error) = completion {
-                                        promise(.failure(error))
-                                    }
-                                },
-                                receiveValue: { mediaEntry in
-                                    promise(.success(mediaEntry))
-                                }
-                            )
-                            .store(in: &cancellables)
-                        }
-                    }
+                
+                let fileName = UUID().uuidString + ".mov"
+                let destinationURL = getDocumentsDirectory(appending: fileName)
+                
+                do {
+                    try FileManager.default.copyItem(at: url, to: destinationURL)
+                } catch {
+                    logger.error("\(MediaFileWorkerError.copyError(error: error).errorDescription)")
+                    promise(.failure(.copyError(error: error)))
                 }
-            } else {
-                promise(.failure(.unsupportedFormat))
+                
+                storageService.addMediaEntry(
+                    of: .video,
+                    withPath: fileName,
+                    for: geoEntry
+                )
+                .mapError { MediaFileWorkerError.storageServiceError(error: $0) }
+                .sink(
+                    receiveCompletion: { [weak self] completion in
+                        if case let .failure(error) = completion {
+                            self?.logger.error("\(error.localizedDescription)")
+                            promise(.failure(error))
+                        }
+                    },
+                    receiveValue: { mediaEntry in
+                        promise(.success(mediaEntry))
+                    }
+                )
+                .store(in: &cancellables)
             }
         }
         .eraseToAnyPublisher()
     }
     
-    private func getDocumentsDirectory() -> URL {
+    private func saveImage(
+        forGeoEntry geoEntry: GeoEntry? = nil,
+        provider: NSItemProvider
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
+        return Future { promise in
+            provider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
+                guard let self,
+                      let image = object as? UIImage,
+                      error == nil else {
+                    promise(.failure(.readingError(error: error)))
+                    return
+                }
+                
+                let imageName = UUID().uuidString + ".jpg"
+                let imagePath = getDocumentsDirectory(appending: imageName)
+                if let jpegData = image.jpegData(compressionQuality: 0.95) {
+                    do {
+                        try jpegData.write(to: imagePath)
+                    } catch {
+                        promise(.failure(.copyError(error: error)))
+                    }
+                    
+                    storageService.addMediaEntry(
+                        of: .image,
+                        withPath: imageName,
+                        for: geoEntry
+                    )
+                    .mapError({ MediaFileWorkerError.storageServiceError(error: $0) })
+                    .receive(on: DispatchQueue.global())
+                    .sink(
+                        receiveCompletion: { completion in
+                            if case let .failure(error) = completion {
+                                promise(.failure(error))
+                            }
+                        },
+                        receiveValue: { mediaEntry in
+                            promise(.success(mediaEntry))
+                        }
+                    )
+                    .store(in: &cancellables)
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    private func getDocumentsDirectory(appending fileName: String) -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return paths[0]
+        return paths[0].appending(path: fileName)
     }
 }

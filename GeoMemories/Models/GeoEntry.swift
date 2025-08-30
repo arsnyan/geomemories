@@ -9,8 +9,8 @@ import Foundation
 import CoreStore
 
 class GeoEntry: CoreStoreObject {
-    @Field.Stored("id")
-    var id: UUID = UUID()
+    @Field.Stored("id", dynamicInitialValue: { UUID() })
+    var id: UUID
     
     @Field.Stored("title")
     var title: String = ""

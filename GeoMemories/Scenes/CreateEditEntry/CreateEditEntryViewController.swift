@@ -164,14 +164,9 @@ private extension CreateEditEntryViewController {
             right: 16
         )
         entryDescriptionTextView.font = .systemFont(ofSize: 17)
-        entryDescriptionTextView.setContentHuggingPriority(
-            .defaultLow,
-            for: .vertical
-        )
-        entryDescriptionTextView.setContentCompressionResistancePriority(
-            .defaultHigh,
-            for: .vertical
-        )
+        entryDescriptionTextView.snp.makeConstraints { make in
+            make.height.equalTo(160)
+        }
         
         entryDescriptionContainer = UIStackView(
             arrangedSubviews: [
@@ -192,8 +187,6 @@ private extension CreateEditEntryViewController {
         entryDescriptionContainer.snp.makeConstraints { make in
             make.top.equalTo(entryTitleTextField.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
-            make.height.greaterThanOrEqualTo(160)
-            make.height.lessThanOrEqualTo(320)
         }
     }
     

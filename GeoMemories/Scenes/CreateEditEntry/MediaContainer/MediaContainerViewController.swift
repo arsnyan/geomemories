@@ -8,13 +8,18 @@
 import UIKit
 import SnapKit
 import PhotosUI
+import Combine
+import OSLog
 
 protocol MediaContainerViewControllerDelegate: AnyObject {
     func updateContentHeight(_ height: CGFloat)
 }
 
 class MediaContainerViewController: UIViewController {
-    private let cellIdentifier = "MediaCell"
+    private var cancellables = Set<AnyCancellable>()
+    
+    private let logger = Logger(subsystem: "GeoMemories", category: "MediaContainerVC")
+    private let worker = Dependencies.mediaFileWorker
     
     weak var delegate: MediaContainerViewControllerDelegate?
     
@@ -83,7 +88,21 @@ private extension MediaContainerViewController {
         
         addMediaButton = UIButton(configuration: config)
         let action = UIAction { _ in
-            self.present(self.picker, animated: true)
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
+                switch status {
+                case .notDetermined:
+                    print("impossible")
+                case .restricted, .denied:
+                    print("oh no")
+                case .authorized, .limited:
+                    guard let self else { return }
+                    DispatchQueue.main.async {
+                        self.present(self.picker, animated: true)
+                    }
+                @unknown default:
+                    fatalError("OH NO!")
+                }
+            }
         }
         addMediaButton.addAction(action, for: .touchUpInside)
     }
@@ -142,8 +161,8 @@ private extension MediaContainerViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(
-            UICollectionViewCell.self,
-            forCellWithReuseIdentifier: cellIdentifier
+            MediaPlaceholderViewCell.self,
+            forCellWithReuseIdentifier: MediaPlaceholderViewCell.reuseIdentifier
         )
         
         view.addSubview(collectionView)
@@ -176,7 +195,11 @@ private extension MediaContainerViewController {
         
         collectionViewHeightConstraint?.update(offset: totalHeight)
         
-        delegate?.updateContentHeight(totalHeight)
+        let buttonContainerHeight = buttonContainer.frame.height
+        let spacingBetweenViews: CGFloat = items.isEmpty ? 0 : 8
+        let totalHeightWithButtons = totalHeight + buttonContainerHeight + spacingBetweenViews
+        
+        delegate?.updateContentHeight(totalHeightWithButtons)
     }
 }
 
@@ -192,13 +215,15 @@ extension MediaContainerViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: cellIdentifier,
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: MediaPlaceholderViewCell.reuseIdentifier,
             for: indexPath
-        )
+        ) as? MediaPlaceholderViewCell else {
+            return UICollectionViewCell()
+        }
         
-        cell.backgroundColor = .systemBlue
-        cell.layer.cornerRadius = 8
+        let item = items[indexPath.item]
+        cell.setup(with: item)
         
         return cell
     }
@@ -267,7 +292,30 @@ extension MediaContainerViewController: PHPickerViewControllerDelegate {
         _ picker: PHPickerViewController,
         didFinishPicking results: [PHPickerResult]
     ) {
+        results.forEach { result in
+            worker.saveMedia(forEntry: nil, result: result)
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case let .failure(error) = completion {
+                            self.logger.error("Error saving media: \(error)")
+                        }
+                    },
+                    receiveValue: { entry in
+                        self.items.append(entry)
+                        self.collectionView.insertItems(
+                            at: [IndexPath(
+                                item: self.items.count - 1,
+                                section: 0
+                            )]
+                        )
+                        self.updateCollectionViewHeight()
+                    }
+                )
+                .store(in: &cancellables)
+        }
         
+        picker.dismiss(animated: true)
     }
 }
 
