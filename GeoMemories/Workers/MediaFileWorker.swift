@@ -9,11 +9,14 @@ import OSLog
 import UIKit
 import PhotosUI
 import Combine
+import AVFoundation
 
-enum FileServiceError: LocalizedError {
+enum MediaFileWorkerError: LocalizedError {
     case storageServiceError(error: StorageServiceError)
     case unsupportedFormat
     case copyError(error: Error)
+    case readingError(error: Error?)
+    case noSelfFound
     
     var errorDescription: String {
         switch self {
@@ -23,17 +26,23 @@ enum FileServiceError: LocalizedError {
             "The picker result is not a supported format"
         case .copyError(let error):
             "Failed to copy file: \(error.localizedDescription)"
+        case .readingError:
+            "Failed to transform file contents to UIImage"
+        case .noSelfFound:
+            "Self was captured but not available. Something went wrong"
         }
     }
 }
 
-protocol FileServiceProtocol {
+protocol MediaFileWorkerProtocol {
     
 }
 
-final class FileService: FileServiceProtocol {
+final class MediaFileWorker: MediaFileWorkerProtocol {
     private let logger = Logger(subsystem: "GeoMemories", category: "FileService")
     private let storageService: StorageServiceProtocol
+    
+    private let placeholderCache = NSCache<NSString, UIImage>()
     
     private var cancellables: Set<AnyCancellable> = []
     
@@ -41,11 +50,69 @@ final class FileService: FileServiceProtocol {
         self.storageService = storageService
     }
     
+    func loadMediaPlaceholder(
+        from mediaEntry: MediaEntry
+    ) -> AnyPublisher<UIImage, MediaFileWorkerError> {
+        if let image = placeholderCache.object(
+            forKey: NSString(string: mediaEntry.mediaPath)
+        ) {
+            return Just(image)
+                .setFailureType(to: MediaFileWorkerError.self)
+                .eraseToAnyPublisher()
+        }
+        
+        return Future<UIImage, MediaFileWorkerError> { [weak self] promise in
+            guard let self else {
+                promise(.failure(.noSelfFound))
+                return
+            }
+            
+            let path = getDocumentsDirectory().appending(path: mediaEntry.mediaPath, directoryHint: .notDirectory)
+            
+            if mediaEntry.mediaType == MediaType.image.rawValue {
+                guard let image = UIImage(contentsOfFile: path.path()) else {
+                    promise(.failure(.readingError(error: nil)))
+                    return
+                }
+                
+                placeholderCache.setObject(
+                    image,
+                    forKey: NSString(string: mediaEntry.mediaPath)
+                )
+                
+                promise(.success(image))
+            } else if mediaEntry.mediaType == MediaType.video.rawValue {
+                let asset = AVURLAsset(url: path)
+                let generator = AVAssetImageGenerator(asset: asset)
+                generator.appliesPreferredTrackTransform = true
+                
+                let timestamp = CMTime(seconds: 1, preferredTimescale: 60)
+                
+                do {
+                    let imageRef = try generator.copyCGImage(at: timestamp, actualTime: nil)
+                    let image = UIImage(cgImage: imageRef)
+                    
+                    placeholderCache.setObject(
+                        image,
+                        forKey: NSString(string: mediaEntry.mediaPath)
+                    )
+                    
+                    promise(.success(image))
+                } catch {
+                    promise(.failure(.readingError(error: error)))
+                }
+            } else {
+                promise(.failure(.unsupportedFormat))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
     func saveMedia(
         forEntry geoEntry: GeoEntry? = nil,
         result: PHPickerResult
-    ) -> AnyPublisher<MediaEntry, FileServiceError> {
-        return Future<MediaEntry, FileServiceError>() { promise in
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
+        return Future<MediaEntry, MediaFileWorkerError> { promise in
             let provider = result.itemProvider
             if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
                 provider.loadFileRepresentation(
@@ -68,10 +135,10 @@ final class FileService: FileServiceProtocol {
                         
                         storageService.addMediaEntry(
                             of: .video,
-                            withPath: destinationURL.absoluteString,
+                            withPath: fileName,
                             for: geoEntry
                         )
-                        .mapError { FileServiceError.storageServiceError(error: $0) }
+                        .mapError { MediaFileWorkerError.storageServiceError(error: $0) }
                         .sink(
                             receiveCompletion: { completion in
                                 if case let .failure(error) = completion {
@@ -105,7 +172,7 @@ final class FileService: FileServiceProtocol {
                                 withPath: imagePath.absoluteString,
                                 for: geoEntry
                             )
-                            .mapError({ FileServiceError.storageServiceError(error: $0) })
+                            .mapError({ MediaFileWorkerError.storageServiceError(error: $0) })
                             .sink(
                                 receiveCompletion: { completion in
                                     if case let .failure(error) = completion {

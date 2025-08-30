@@ -11,7 +11,7 @@ import Foundation
 // so here I'll declare all the dependencies instead of using DI libraries
 struct Dependencies {
     static let storageService: StorageServiceProtocol = StorageService()
-    static let fileService: FileServiceProtocol = FileService(
+    static let mediaFileWorker: MediaFileWorkerProtocol = MediaFileWorker(
         storageService: storageService
     )
 }
