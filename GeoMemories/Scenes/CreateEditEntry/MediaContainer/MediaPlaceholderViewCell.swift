@@ -29,8 +29,19 @@ class MediaPlaceholderViewCell: UICollectionViewCell {
         super.init(frame: frame)
         
         addSubview(imageView)
+        
+        let crossImage = UIImage(systemName: "xmark.circle.fill")
+        let crossImageView = UIImageView(image: crossImage)
+        crossImageView.tintColor = .systemGray
+        imageView.addSubview(crossImageView)
+        
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        crossImageView.snp.makeConstraints { make in
+            make.size.equalTo(16)
+            make.top.trailing.equalToSuperview().inset(4)
         }
     }
     

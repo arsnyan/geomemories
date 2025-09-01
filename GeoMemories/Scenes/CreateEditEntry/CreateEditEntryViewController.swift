@@ -15,6 +15,8 @@ protocol CreateEditEntryDisplayLogic: AnyObject {
     func configureNavigationBarTitle(
         viewModel: CreateEditEntry.ConfigurePurpose.ViewModel
     )
+    
+    func dismissView()
 }
 
 // MARK: - View Controller
@@ -48,6 +50,10 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
     func configureNavigationBarTitle(viewModel: CreateEditEntry.ConfigurePurpose.ViewModel) {
         title = viewModel.title
     }
+    
+    func dismissView() {
+        dismiss(animated: true)
+    }
 }
 
 // MARK: - Private selector methods
@@ -57,7 +63,12 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
     }
     
     func saveEntry() {
-        
+        interactor?.saveEntry(
+            request: .init(
+                title: entryTitleTextField.text ?? "",
+                description: entryDescriptionTextView.text ?? ""
+            )
+        )
     }
 }
 
@@ -88,8 +99,10 @@ private extension CreateEditEntryViewController {
     func setupSearchLocationContainer() {
         searchLocation = SearchLocationContainerViewController()
         SearchLocationContainerConfigurator.shared.configure(
-            viewController: searchLocation
+            viewController: searchLocation,
+            with: router?.dataStore?.entry
         )
+        searchLocation.interactor?.delegate = interactor
         addChild(searchLocation)
         view.addSubview(searchLocation.view)
         
@@ -193,6 +206,7 @@ private extension CreateEditEntryViewController {
     func setupMediaContainer() {
         mediaContainer = MediaContainerViewController()
         mediaContainer.delegate = self
+        mediaContainer.geoEntry = router?.dataStore?.entry
         addChild(mediaContainer)
         view.addSubview(mediaContainer.view)
         
@@ -238,6 +252,10 @@ extension CreateEditEntryViewController: MediaContainerViewControllerDelegate {
         UIView.animate(withDuration: 0.25) { [unowned self] in
             view.layoutIfNeeded()
         }
+    }
+    
+    func mediaItemsDidChange(_ items: [MediaEntry]) {
+        interactor?.updateMediaItems(request: .init(mediaItems: items))
     }
 }
 

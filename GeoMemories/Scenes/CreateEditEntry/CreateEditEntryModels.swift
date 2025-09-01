@@ -15,6 +15,7 @@ import MapKit
 // swiftlint:disable nesting
 enum CreateEditEntry {
     // MARK: Use cases
+    
     enum ConfigurePurpose {
         struct Response {
             let isEditMode: Bool
@@ -47,24 +48,6 @@ enum CreateEditEntry {
         }
     }
     
-    enum LoadExistingEntry {
-        
-    }
-    
-    enum ChangeEntryTitle {
-        struct Response {
-            
-        }
-        
-        struct ViewModel {
-            
-        }
-    }
-    
-    enum ChangeDescription {
-        
-    }
-    
     enum ChooseLocation {
         enum Request {
             case abort
@@ -86,19 +69,16 @@ enum CreateEditEntry {
         }
     }
     
-    enum AddPhoto {
-        
-    }
-    
-    enum AddVideo {
-        
-    }
-    
-    enum DeleteMedia {
-        
+    enum UpdateMedia {
+        struct Request {
+            let mediaItems: [MediaEntry]
+        }
     }
     
     enum Save {
-        
+        struct Request {
+            let title: String
+            let description: String
+        }
     }
 }

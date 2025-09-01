@@ -68,7 +68,7 @@ class HomeInteractor: HomeBusinessLogic, HomeDataStore {
     func provideMapEntries() {
         presenter?.presentMapEntries(response: .loading)
         
-        StorageService().getGeoEntries()
+        storageService.getGeoEntries()
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in

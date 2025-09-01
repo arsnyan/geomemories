@@ -13,13 +13,17 @@ final class SearchLocationContainerConfigurator {
     
     private init() {}
     
-    func configure(viewController: SearchLocationContainerViewController) {
+    func configure(
+        viewController: SearchLocationContainerViewController,
+        with geoEntry: GeoEntry? = nil
+    ) {
         let interactor = SearchLocationContainerInteractor()
         let presenter = SearchLocationContainerPresenter()
         let router = SearchLocationContainerRouter()
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
+        interactor.geoEntry = geoEntry
         presenter.viewController = viewController
         router.viewController = viewController
         router.dataStore = interactor

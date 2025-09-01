@@ -62,6 +62,7 @@ class SearchLocationContainerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        interactor?.loadInitialLocation()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

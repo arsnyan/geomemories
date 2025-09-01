@@ -44,6 +44,8 @@ protocol MediaFileWorkerProtocol {
         forEntry geoEntry: GeoEntry?,
         result: PHPickerResult
     ) -> AnyPublisher<MediaEntry, MediaFileWorkerError>
+    
+    func deleteMedia(_ entry: MediaEntry, completionHandler: @escaping () -> Void)
 }
 
 final class MediaFileWorker: MediaFileWorkerProtocol {
@@ -74,39 +76,12 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
                 return image
             }
             
-            let path = getDocumentsDirectory(appending: mediaEntry.mediaPath)
+            let pathUrl = getDocumentsDirectory(appending: mediaEntry.mediaPath)
             
             if mediaEntry.mediaType == MediaType.image.rawValue {
-                guard let image = UIImage(contentsOfFile: path.path()) else {
-                    throw MediaFileWorkerError.readingError(error: nil)
-                }
-                
-                placeholderCache.setObject(
-                    image,
-                    forKey: NSString(string: mediaEntry.mediaPath)
-                )
-                
-                return image
+                return try loadImagePlaceholder(from: pathUrl.path())
             } else if mediaEntry.mediaType == MediaType.video.rawValue {
-                let asset = AVURLAsset(url: path)
-                let generator = AVAssetImageGenerator(asset: asset)
-                generator.appliesPreferredTrackTransform = true
-                
-                let timestamp = CMTime(seconds: 1, preferredTimescale: 60)
-                
-                do {
-                    let imageRef = try generator.copyCGImage(at: timestamp, actualTime: nil)
-                    let image = UIImage(cgImage: imageRef)
-                    
-                    placeholderCache.setObject(
-                        image,
-                        forKey: NSString(string: mediaEntry.mediaPath)
-                    )
-                    
-                    return image
-                } catch {
-                    throw MediaFileWorkerError.readingError(error: error)
-                }
+                return try loadVideoPlaceholder(from: pathUrl, for: mediaEntry.mediaPath)
             } else {
                 throw MediaFileWorkerError.unsupportedFormat
             }
@@ -131,6 +106,44 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
             logger.error("\(MediaFileWorkerError.unsupportedFormat.errorDescription)")
             return Fail(error: MediaFileWorkerError.unsupportedFormat)
                 .eraseToAnyPublisher()
+        }
+    }
+    
+    private func loadImagePlaceholder(from mediaPath: String) throws -> UIImage {
+        guard let image = UIImage(contentsOfFile: mediaPath) else {
+            throw MediaFileWorkerError.readingError(error: nil)
+        }
+        
+        placeholderCache.setObject(
+            image,
+            forKey: NSString(string: mediaPath)
+        )
+        
+        return image
+    }
+    
+    private func loadVideoPlaceholder(
+        from pathUrl: URL,
+        for mediaPath: String
+    ) throws -> UIImage {
+        let asset = AVURLAsset(url: pathUrl)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        
+        let timestamp = CMTime(seconds: 1, preferredTimescale: 60)
+        
+        do {
+            let imageRef = try generator.copyCGImage(at: timestamp, actualTime: nil)
+            let image = UIImage(cgImage: imageRef)
+            
+            placeholderCache.setObject(
+                image,
+                forKey: NSString(string: mediaPath)
+            )
+            
+            return image
+        } catch {
+            throw MediaFileWorkerError.readingError(error: error)
         }
     }
     
@@ -226,6 +239,23 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
             }
         }
         .eraseToAnyPublisher()
+    }
+    
+    func deleteMedia(_ entry: MediaEntry, completionHandler: @escaping () -> Void) {
+        CoreStoreDefaults.dataStack.perform(
+            asynchronous: { transaction in
+                let existing = transaction.fetchExisting(entry)!
+                transaction.delete(existing)
+            },
+            completion: { [weak self] completion in
+                switch completion {
+                case .success(_):
+                    completionHandler()
+                case .failure(let error):
+                    self?.logger.error("Something went wrong while deleting media: \(error)")
+                }
+            }
+        )
     }
     
     private func getDocumentsDirectory(appending fileName: String) -> URL {

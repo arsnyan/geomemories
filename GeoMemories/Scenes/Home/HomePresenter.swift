@@ -12,6 +12,8 @@
 
 import CoreLocation
 import MapKit
+import CoreStore
+import Combine
 
 protocol HomePresentationLogic {
     func presentCurrentLocation(response: Home.SelectCurrentLocation.Response)
@@ -19,6 +21,8 @@ protocol HomePresentationLogic {
 }
 
 class HomePresenter: HomePresentationLogic {
+    private var cancellables: Set<AnyCancellable> = []
+    
     weak var viewController: HomeDisplayLogic?
     
     func presentCurrentLocation(response: Home.SelectCurrentLocation.Response) {
@@ -56,27 +60,71 @@ class HomePresenter: HomePresentationLogic {
         }
     }
     
+    // swiftlint:disable large_tuple
     func presentMapEntries(response: Home.ShowMapEntries.Response) {
         switch response {
         case .loading:
             viewController?.displayMapEntries(viewModel: .loading)
         case .success(let entries):
-            // FIXME: - It is 100% incorrect, need to think about retrieving image from local storage
-            let annotations = entries.map { entry in
-                MemoryAnnotation(
-                    latitude: entry.latitude,
-                    longitude: entry.longitude,
-                    image: UIImage(
-                        named: entry.mediaIds
-                            .first(
-                                where: {
-                                    $0.mediaType == MediaType.image.rawValue
-                                }
-                            )?.mediaPath ?? ""
+            Dependencies.dataStack.reactive.perform { transaction -> [(lat: Double, long: Double, title: String, mediaEntry: MediaEntry?)] in
+                let existing = entries.compactMap { transaction.fetchExisting($0) }
+                return existing.map {
+                    entry -> (lat: Double, long: Double, title: String, mediaEntry: MediaEntry?) in return (
+                        entry.latitude,
+                        entry.longitude,
+                        entry.title,
+                        entry.mediaIds.first
                     )
-                )
+                }
             }
-            viewController?.displayMapEntries(viewModel: .sucess(annotations: annotations))
+            .catch { _ in Just([]).eraseToAnyPublisher() }
+            .flatMap { entriesData -> AnyPublisher<[MemoryAnnotation], Never> in
+                guard !entriesData.isEmpty else {
+                    return Just([]).eraseToAnyPublisher()
+                }
+                
+                let publishers = entriesData.map { lat, lng, title, media in
+                    if let media {
+                        return Dependencies.mediaFileWorker.loadMediaPlaceholder(from: media)
+                            .map { image in
+                                return MemoryAnnotation(
+                                    latitude: lat,
+                                    longitude: lng,
+                                    title: title,
+                                    image: image
+                                )
+                            }
+                            .replaceError(
+                                with: MemoryAnnotation(
+                                    latitude: lat,
+                                    longitude: lng,
+                                    title: title,
+                                    image: UIImage(systemName: "person.crop.circle.badge.exclamationmark.fill")!
+                                )
+                            )
+                            .eraseToAnyPublisher()
+                    } else {
+                        return Just(
+                            MemoryAnnotation(
+                                latitude: lat,
+                                longitude: lng,
+                                title: title,
+                                image: UIImage(systemName: "person.crop.circle.badge.exclamationmark.fill")!
+                            )
+                        )
+                        .eraseToAnyPublisher()
+                    }
+                }
+                
+                return Publishers.MergeMany(publishers)
+                    .collect()
+                    .eraseToAnyPublisher()
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] annotations in
+                self?.viewController?.displayMapEntries(viewModel: .sucess(annotations: annotations))
+            }
+            .store(in: &cancellables)
         case .failure(let error):
             let title: String
             let message: String

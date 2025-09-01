@@ -16,7 +16,7 @@ import MapKit
 
 protocol HomeDisplayLogic: AnyObject {
     func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel)
-    // TODO: - Make annotations, popups for annotations, add new entry functionality and show details functionality
+    // TODO: - Make popups for annotations, add new entry functionality and show details functionality
     func displayMapEntries(viewModel: Home.ShowMapEntries.ViewModel)
 }
 
@@ -28,6 +28,10 @@ class HomeViewController: UIViewController {
     
     private let mapView: MKMapView = {
         let map = MKMapView()
+        map.register(
+            MemoryAnnotationView.self,
+            forAnnotationViewWithReuseIdentifier: MemoryAnnotationView.reuseIdentifier
+        )
         map.showsUserLocation = true
         return map
     }()
@@ -43,6 +47,13 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateEntries),
+            name: NSNotification.Name("EntriesUpdated"),
+            object: nil
+        )
     }
 }
 
@@ -52,6 +63,8 @@ extension HomeViewController: MKMapViewDelegate {
         _ mapView: MKMapView,
         viewFor annotation: any MKAnnotation
     ) -> MKAnnotationView? {
+        guard !(annotation is MKUserLocation) else { return nil }
+        
         if let memoryAnnotation = annotation as? MemoryAnnotation {
             let identifier = MemoryAnnotationView.reuseIdentifier
             var view = mapView.dequeueReusableAnnotationView(
@@ -107,6 +120,7 @@ private extension HomeViewController {
     func setupUI() {
         defer { setupConstraints() }
         setupToolbar()
+        mapView.delegate = self
         view.addSubview(mapView)
         interactor?.provideMapEntries()
     }
@@ -126,6 +140,10 @@ private extension HomeViewController {
     
     func addBarButtonTapped() {
         router?.routeToCreateEditEntry(geoEntry: nil)
+    }
+    
+    func updateEntries() {
+        interactor?.provideMapEntries()
     }
 }
 

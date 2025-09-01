@@ -14,14 +14,22 @@ import CoreLocation
 import Combine
 import MapKit
 import OSLog
+import CoreStore
+
+protocol SearchLocationContainerDelegate: AnyObject {
+    func didUpdateLocation(coordinate: CLLocationCoordinate2D?)
+}
 
 protocol SearchLocationContainerBusinessLogic {
+    func loadInitialLocation()
     func provideLocationSearchResults(request: SearchLocationContainer.SearchLocation.Request)
     func selectLocation(request: SearchLocationContainer.ChooseLocation.Request)
+    
+    var delegate: SearchLocationContainerDelegate? { get set }
 }
 
 protocol SearchLocationContainerDataStore {
-    
+    var geoEntry: GeoEntry? { get set }
 }
 
 class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, SearchLocationContainerDataStore {
@@ -31,9 +39,32 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
     var presenter: SearchLocationContainerPresentationLogic?
     var locationWorker: LocationWorker? = LocationWorker()
     
+    weak var delegate: SearchLocationContainerDelegate?
+    var geoEntry: GeoEntry?
+    
     private let cachedSearchResults = NSCache<NSString, NSArray>()
     
     private var isCurrentLocationSelected: Bool = false
+    
+    func loadInitialLocation() {
+        guard let geoEntry else { return }
+        
+        Dependencies.dataStack.perform { [weak self] transaction in
+            guard let existing = transaction.fetchExisting(geoEntry) else { return }
+            
+            let location = CLLocation(
+                latitude: existing.latitude,
+                longitude: existing.longitude
+            )
+            self?.presenter?.presentSelectedLocation(
+                response: .successWithCurrentLocation(location: location)
+            )
+        } completion: { [weak self] result in
+            if case let .failure(error) = result {
+                self?.logger.error("Something went wrong while fetching geo entry: \(error)")
+            }
+        }
+    }
     
     func provideLocationSearchResults(
         request: SearchLocationContainer.SearchLocation.Request
@@ -106,12 +137,18 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
             }
             
             isCurrentLocationSelected = false
+            if #available(iOS 26.0, *) {
+                delegate?.didUpdateLocation(coordinate: mapItem.location.coordinate)
+            } else {
+                delegate?.didUpdateLocation(coordinate: mapItem.placemark.coordinate)
+            }
             presenter?.presentSelectedLocation(
                 response: .successWithSelectedLocation(mapItem: mapItem)
             )
         case .current:
             if isCurrentLocationSelected {
                 isCurrentLocationSelected.toggle()
+                delegate?.didUpdateLocation(coordinate: nil)
                 presenter?.presentSelectedLocation(response: .empty)
             } else {
                 locationWorker?.getCurrentLocation()
@@ -119,6 +156,7 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
                         receiveCompletion: { [weak self] completion in
                             if case let .failure(error) = completion {
                                 self?.logger.error("\(error)")
+                                self?.delegate?.didUpdateLocation(coordinate: nil)
                                 self?.presenter?.presentSelectedLocation(
                                     response: .failure(error: error)
                                 )
@@ -126,6 +164,7 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
                         },
                         receiveValue: { [weak self] location in
                             self?.isCurrentLocationSelected.toggle()
+                            self?.delegate?.didUpdateLocation(coordinate: location.coordinate)
                             self?.presenter?.presentSelectedLocation(
                                 response: .successWithCurrentLocation(location: location)
                             )

@@ -10,9 +10,11 @@ import SnapKit
 import PhotosUI
 import Combine
 import OSLog
+import CoreStore
 
 protocol MediaContainerViewControllerDelegate: AnyObject {
     func updateContentHeight(_ height: CGFloat)
+    func mediaItemsDidChange(_ items: [MediaEntry])
 }
 
 class MediaContainerViewController: UIViewController {
@@ -22,9 +24,14 @@ class MediaContainerViewController: UIViewController {
     private let worker = Dependencies.mediaFileWorker
     
     weak var delegate: MediaContainerViewControllerDelegate?
+    var geoEntry: GeoEntry?
     
-    private var items: [MediaEntry] = []
-    private let itemsPerRow = 5
+    private var items: [MediaEntry] = [] {
+        didSet {
+            delegate?.mediaItemsDidChange(items)
+        }
+    }
+    private let itemsPerRow = 4
     private let spacing = 8
     
     private var cameraPicker: UIImagePickerController!
@@ -42,6 +49,18 @@ class MediaContainerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        if let geoEntry {
+            Dependencies.dataStack.perform { [weak self] transaction in
+                guard let existing = transaction.fetchExisting(geoEntry) else { return }
+                self?.items = Array(existing.mediaIds)
+                self?.collectionView.reloadData()
+            } completion: { [weak self] result in
+                if case let .failure(error) = result {
+                    self?.logger.error("Failed to fetch geo entry: \(error)")
+                }
+            }
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -53,21 +72,24 @@ class MediaContainerViewController: UIViewController {
 // MARK: - UI Configuration
 private extension MediaContainerViewController {
     func setupUI() {
-        configurePicker()
         configureAddMediaButton()
         configureTakeMediaButton()
         configureButtonContainer()
         configureCollectionView()
     }
     
-    func configurePicker() {
+    func configureCameraPicker() {
         cameraPicker = UIImagePickerController()
         cameraPicker.sourceType = .camera
         cameraPicker.allowsEditing = true
         cameraPicker.delegate = self
-        
+    }
+    
+    func configurePhotosPicker() {
         var pickerConfig = PHPickerConfiguration()
         pickerConfig.filter = .any(of: [.images, .videos])
+        pickerConfig.selectionLimit = 0
+        pickerConfig.selection = .default
         picker = PHPickerViewController(configuration: pickerConfig)
         picker.delegate = self
     }
@@ -87,7 +109,9 @@ private extension MediaContainerViewController {
         )
         
         addMediaButton = UIButton(configuration: config)
-        let action = UIAction { _ in
+        let action = UIAction { [weak self] _ in
+            self?.configurePhotosPicker()
+            
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
                 switch status {
                 case .notDetermined:
@@ -122,8 +146,11 @@ private extension MediaContainerViewController {
         )
         
         takeMediaButton = UIButton(configuration: config)
-        let action = UIAction { _ in
-            self.present(self.cameraPicker, animated: true)
+        let action = UIAction { [weak self] _ in
+            guard let self else { return }
+            
+            configureCameraPicker()
+            present(cameraPicker, animated: true)
         }
         takeMediaButton.addAction(action, for: .touchUpInside)
     }
@@ -282,8 +309,12 @@ extension MediaContainerViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        items.remove(at: indexPath.item)
-        collectionView.deleteItems(at: [indexPath])
+        worker.deleteMedia(items[indexPath.item]) {
+            DispatchQueue.main.async { [weak self] in
+                self?.items.remove(at: indexPath.item)
+                self?.collectionView.deleteItems(at: [indexPath])
+            }
+        }
     }
 }
 
@@ -314,6 +345,7 @@ extension MediaContainerViewController: PHPickerViewControllerDelegate {
                 )
                 .store(in: &cancellables)
         }
+        
         
         picker.dismiss(animated: true)
     }

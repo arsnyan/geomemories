@@ -71,7 +71,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CoreStoreConfiguratorPr
                     ),
                     Entity<MediaEntry>(
                         "MediaEntry",
-                        uniqueConstraints: [[\.$linkedGeoEntry]]
+                        uniqueConstraints: [[\.$mediaPath]]
                     )
                 ],
                 versionLock: [
@@ -82,10 +82,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CoreStoreConfiguratorPr
                         0x49d8668612e8e979
                     ],
                     "MediaEntry": [
-                        0xbff9a08a10de99ab,
-                        0xde044bd40d4c8fc2,
-                        0x6fbb53aff57dc915,
-                        0xa0f50dc9884819b5
+                        0x69ca0596b7b69e92,
+                        0x7a8305f7a674adee,
+                        0x9772226100e9079a,
+                        0x3a11d17d7a2e5c35
                     ]
                 ]
             )
