@@ -1,0 +1,31 @@
+//
+//  SearchLocationContainerConfigurator.swift
+//  GeoMemories
+//
+//  Created by Арсен Саруханян on 24.08.2025.
+//
+
+import Foundation
+
+@MainActor
+final class SearchLocationContainerConfigurator {
+    static let shared = SearchLocationContainerConfigurator()
+    
+    private init() {}
+    
+    func configure(
+        viewController: SearchLocationContainerViewController,
+        with geoEntry: GeoEntry? = nil
+    ) {
+        let interactor = SearchLocationContainerInteractor()
+        let presenter = SearchLocationContainerPresenter()
+        let router = SearchLocationContainerRouter()
+        viewController.interactor = interactor
+        viewController.router = router
+        interactor.presenter = presenter
+        interactor.geoEntry = geoEntry
+        presenter.viewController = viewController
+        router.viewController = viewController
+        router.dataStore = interactor
+    }
+}

@@ -6,44 +6,127 @@
 //
 
 import UIKit
+import CoreStore
+import Combine
+import OSLog
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+protocol CoreStoreConfiguratorProtocol {
+    var dataStack: DataStack! { get }
+    func configureCoreStore()
+}
+
+class SceneDelegate: UIResponder, UIWindowSceneDelegate, CoreStoreConfiguratorProtocol {
+    internal var dataStack: DataStack!
+    private var cancellables = Set<AnyCancellable>()
+    
     var window: UIWindow?
+    
+    let logger = Logger(subsystem: "GeoMemories", category: "SceneDelegate")
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        // window?.rootViewController =
+        configureCoreStore()
+        
         window?.makeKeyAndVisible()
     }
+    
+    private func setupRootViewController() {
+        let mainViewController = HomeConfigurator.shared.createScene(with: dataStack)
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
+        let navigationController = UINavigationController(rootViewController: mainViewController)
+        
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
     }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // Called when the scene has moved from an inactive state to an active state.
-        // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+    
+    private func showAlert(_ error: Error) {
+        let alertController = UIAlertController(
+            title: String(localized: "error"),
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alertController.addAction(
+            UIAlertAction(
+                title: String(localized: "ok"),
+                style: .default
+            )
+        )
+        window?.rootViewController?.present(alertController, animated: true)
     }
-
-    func sceneWillResignActive(_ scene: UIScene) {
-        // Called when the scene will move from an active state to an inactive state.
-        // This may occur due to temporary interruptions (ex. an incoming phone call).
+    
+    private func configureDataStack() {
+        dataStack = DataStack(
+            CoreStoreSchema(
+                modelVersion: "V1",
+                entities: [
+                    Entity<GeoEntry>(
+                        "GeoEntry",
+                        uniqueConstraints: [[\.$id]]
+                    ),
+                    Entity<MediaEntry>(
+                        "MediaEntry",
+                        uniqueConstraints: [[\.$mediaPath]]
+                    )
+                ],
+                versionLock: [
+                    "GeoEntry": [
+                        0xfd36820f96da7d07,
+                        0x20e82d66fa4b9573,
+                        0xfab5df6385000409,
+                        0x49d8668612e8e979
+                    ],
+                    "MediaEntry": [
+                        0x69ca0596b7b69e92,
+                        0x7a8305f7a674adee,
+                        0x9772226100e9079a,
+                        0x3a11d17d7a2e5c35
+                    ]
+                ]
+            )
+        )
     }
-
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
-    }
-
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
+    
+    internal func configureCoreStore() {
+        configureDataStack()
+        
+        dataStack.reactive
+            .addStorage(
+                SQLiteStore(
+                    fileName: "core_data.sql",
+                    localStorageOptions: .recreateStoreOnModelMismatch
+                )
+            )
+            .sink(
+                receiveCompletion: { [unowned self] completion in
+                    switch completion {
+                    case .finished:
+                        logger.info("DataStack initialized successfully")
+                        setupRootViewController()
+                    case .failure(let error):
+                        logger.error("Failed to initialized DataStack:\n\(error)")
+                        showAlert(error)
+                    }
+                },
+                receiveValue: { [weak self] progress in
+                    switch progress {
+                    case .migrating(_, let nsProgress):
+                        let formattedProgress = round(nsProgress.fractionCompleted * 100)
+                        self?.logger.trace("Migration progress: \(formattedProgress) %")
+                    case .finished(_, let migrationRequired):
+                        self?.logger.trace(
+                            "Migration finished. Required migration:\n\(migrationRequired)"
+                        )
+                    }
+                }
+            )
+            .store(in: &cancellables)
+        
+        CoreStoreDefaults.dataStack = dataStack
     }
 }
-
