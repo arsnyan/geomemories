@@ -16,6 +16,8 @@ protocol CreateEditEntryBusinessLogic: SearchLocationContainerDelegate {
     func provideNavigationBarTitle()
     func updateMediaItems(request: CreateEditEntry.UpdateMedia.Request)
     func saveEntry(request: CreateEditEntry.Save.Request)
+    
+    func clearMediaInfo()
 }
 
 protocol CreateEditEntryDataStore {
@@ -87,12 +89,27 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
             completion: { [weak self] completion in
                 switch completion {
                 case .success(let geoEntry):
-                    // swiftlint:disable force_cast
-                    self?.entry = geoEntry as! GeoEntry
+                    self?.entry = geoEntry
                     self?.presenter?.unpresentCurrentView()
                     NotificationCenter.default.post(name: NSNotification.Name("EntriesUpdated"), object: nil)
                 case .failure(let error):
                     self?.logger.error("Saving entry failed: \(error)")
+                }
+            }
+        )
+    }
+    
+    func clearMediaInfo() {
+        CoreStoreDefaults.dataStack.perform(
+            asynchronous: { [weak self] transaction in
+                self?.mediaItems.forEach { mediaEntry in
+                    let existing = transaction.fetchExisting(mediaEntry)
+                    transaction.delete(existing)
+                }
+            },
+            completion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.logger.error("There was an error deleting media: \(error)")
                 }
             }
         )

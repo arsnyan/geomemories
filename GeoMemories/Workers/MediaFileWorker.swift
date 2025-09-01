@@ -12,6 +12,7 @@ import Combine
 import AVFoundation
 import CoreStore
 
+// MARK: - Errors
 enum MediaFileWorkerError: LocalizedError {
     case storageServiceError(error: StorageServiceError)
     case unsupportedFormat
@@ -35,6 +36,7 @@ enum MediaFileWorkerError: LocalizedError {
     }
 }
 
+// MARK: - Protocol
 protocol MediaFileWorkerProtocol {
     func loadMediaPlaceholder(
         from mediaEntry: MediaEntry
@@ -45,20 +47,29 @@ protocol MediaFileWorkerProtocol {
         result: PHPickerResult
     ) -> AnyPublisher<MediaEntry, MediaFileWorkerError>
     
+    func saveMedia(
+        forEntry geoEntry: GeoEntry?,
+        image: UIImage
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError>
+    
     func deleteMedia(_ entry: MediaEntry, completionHandler: @escaping () -> Void)
 }
 
+// MARK: - Worker itself
 final class MediaFileWorker: MediaFileWorkerProtocol {
+    // MARK: - Dependencies and Logging
     private let logger = Logger(subsystem: "GeoMemories", category: "FileService")
     private let storageService: StorageServiceProtocol
     
-    private let placeholderCache = NSCache<NSString, UIImage>()
+    // MARK: - Properties and Init
     
-    private var cancellables: Set<AnyCancellable> = []
+    private let placeholderCache = NSCache<NSString, UIImage>()
     
     internal init(storageService: StorageServiceProtocol) {
         self.storageService = storageService
     }
+    
+    // MARK: - Cell Image Loading
     
     func loadMediaPlaceholder(
         from mediaEntry: MediaEntry
@@ -88,25 +99,6 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
         }
         .mapError({ .storageServiceError(error: .coreStoreError($0)) })
         .eraseToAnyPublisher()
-    }
-    
-    func saveMedia(
-        forEntry geoEntry: GeoEntry? = nil,
-        result: PHPickerResult
-    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
-        let provider = result.itemProvider
-        
-        if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
-            return saveVideo(forGeoEntry: geoEntry, provider: provider)
-                .eraseToAnyPublisher()
-        } else if provider.canLoadObject(ofClass: UIImage.self) {
-            return saveImage(forGeoEntry: geoEntry, provider: provider)
-                .eraseToAnyPublisher()
-        } else {
-            logger.error("\(MediaFileWorkerError.unsupportedFormat.errorDescription)")
-            return Fail(error: MediaFileWorkerError.unsupportedFormat)
-                .eraseToAnyPublisher()
-        }
     }
     
     private func loadImagePlaceholder(from mediaPath: String) throws -> UIImage {
@@ -147,50 +139,129 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
         }
     }
     
+    // MARK: - Saving Media — Wrappers
+    
+    func saveMedia(
+        forEntry geoEntry: GeoEntry? = nil,
+        result: PHPickerResult
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
+        let provider = result.itemProvider
+        
+        if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+            return saveVideo(forGeoEntry: geoEntry, provider: provider)
+                .eraseToAnyPublisher()
+        } else if provider.canLoadObject(ofClass: UIImage.self) {
+            return saveImage(forGeoEntry: geoEntry, provider: provider)
+                .eraseToAnyPublisher()
+        } else {
+            logger.error("\(MediaFileWorkerError.unsupportedFormat.errorDescription)")
+            return Fail(error: MediaFileWorkerError.unsupportedFormat)
+                .eraseToAnyPublisher()
+        }
+    }
+    
+    func saveMedia(forEntry geoEntry: GeoEntry?, image: UIImage) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
+        return save(image: image, forGeoEntry: geoEntry).eraseToAnyPublisher()
+    }
+    
+    // MARK: - Saving Media — Private Generic Functions
+    
+    private func save(
+        videoAt sourceURL: URL,
+        forGeoEntry geoEntry: GeoEntry? = nil
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
+        return Future<String, MediaFileWorkerError> { [weak self] promise in
+            guard let self else {
+                promise(.failure(.noSelfFound))
+                return
+            }
+            
+            let fileName = UUID().uuidString + "." + sourceURL.pathExtension
+            let destinationURL = getDocumentsDirectory(appending: fileName)
+            
+            do {
+                try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+                promise(.success(fileName))
+            } catch {
+                logger.error("\(MediaFileWorkerError.copyError(error: error).errorDescription)")
+            }
+        }
+        .flatMap { [storageService] fileName -> AnyPublisher<MediaEntry, MediaFileWorkerError> in
+            storageService.addMediaEntry(
+                of: .video,
+                withPath: fileName,
+                for: geoEntry
+            )
+            .mapError { MediaFileWorkerError.storageServiceError(error: $0) }
+            .eraseToAnyPublisher()
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    private func save(
+        image: UIImage,
+        forGeoEntry geoEntry: GeoEntry? = nil
+    ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
+        return Future<String, MediaFileWorkerError> { [weak self] promise in
+            guard let self else {
+                promise(.failure(.noSelfFound))
+                return
+            }
+            
+            let imageName = UUID().uuidString + ".jpg"
+            let imagePath = getDocumentsDirectory(appending: imageName)
+            
+            guard let jpegData = image.jpegData(compressionQuality: 0.9) else {
+                promise(.failure(.readingError(error: nil)))
+                return
+            }
+            
+            do {
+                try jpegData.write(to: imagePath)
+                promise(.success(imageName))
+            } catch {
+                logger.error("There was an error copying the image to the documents directory: \(error.localizedDescription)")
+                promise(.failure(.copyError(error: error)))
+            }
+        }
+        .flatMap { [storageService] imageName -> AnyPublisher<MediaEntry, MediaFileWorkerError> in
+            return storageService.addMediaEntry(
+                of: .image,
+                withPath: imageName,
+                for: geoEntry
+            )
+            .mapError { MediaFileWorkerError.storageServiceError(error: $0) }
+            .eraseToAnyPublisher()
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    // MARK: - Saving Media — Generic Functions for each use case
+    
     private func saveVideo(
         forGeoEntry geoEntry: GeoEntry? = nil,
         provider: NSItemProvider
     ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
-        return Future { promise in
+        return Future<URL, MediaFileWorkerError> { promise in
             provider.loadFileRepresentation(
                 forTypeIdentifier: UTType.movie.identifier
-            ) { [weak self] url, error in
-                guard let self,
-                      let url,
+            ) { url, error in
+                guard let url,
                       error == nil else {
                     promise(.failure(.readingError(error: error)))
                     return
                 }
                 
-                let fileName = UUID().uuidString + ".mov"
-                let destinationURL = getDocumentsDirectory(appending: fileName)
-                
-                do {
-                    try FileManager.default.copyItem(at: url, to: destinationURL)
-                } catch {
-                    logger.error("\(MediaFileWorkerError.copyError(error: error).errorDescription)")
-                    promise(.failure(.copyError(error: error)))
-                }
-                
-                storageService.addMediaEntry(
-                    of: .video,
-                    withPath: fileName,
-                    for: geoEntry
-                )
-                .mapError { MediaFileWorkerError.storageServiceError(error: $0) }
-                .sink(
-                    receiveCompletion: { [weak self] completion in
-                        if case let .failure(error) = completion {
-                            self?.logger.error("\(error.localizedDescription)")
-                            promise(.failure(error))
-                        }
-                    },
-                    receiveValue: { mediaEntry in
-                        promise(.success(mediaEntry))
-                    }
-                )
-                .store(in: &cancellables)
+                promise(.success(url))
             }
+        }
+        .flatMap { [weak self] url -> AnyPublisher<MediaEntry, MediaFileWorkerError> in
+            guard let self else {
+                return Fail(error: MediaFileWorkerError.noSelfFound)
+                    .eraseToAnyPublisher()
+            }
+            
+            return self.save(videoAt: url, forGeoEntry: geoEntry)
         }
         .eraseToAnyPublisher()
     }
@@ -199,47 +270,29 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
         forGeoEntry geoEntry: GeoEntry? = nil,
         provider: NSItemProvider
     ) -> AnyPublisher<MediaEntry, MediaFileWorkerError> {
-        return Future { promise in
-            provider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
-                guard let self,
-                      let image = object as? UIImage,
+        return Future<UIImage, MediaFileWorkerError> { promise in
+            provider.loadObject(ofClass: UIImage.self) { object, error in
+                guard let image = object as? UIImage,
                       error == nil else {
                     promise(.failure(.readingError(error: error)))
                     return
                 }
                 
-                let imageName = UUID().uuidString + ".jpg"
-                let imagePath = getDocumentsDirectory(appending: imageName)
-                if let jpegData = image.jpegData(compressionQuality: 0.95) {
-                    do {
-                        try jpegData.write(to: imagePath)
-                    } catch {
-                        promise(.failure(.copyError(error: error)))
-                    }
-                    
-                    storageService.addMediaEntry(
-                        of: .image,
-                        withPath: imageName,
-                        for: geoEntry
-                    )
-                    .mapError({ MediaFileWorkerError.storageServiceError(error: $0) })
-                    .receive(on: DispatchQueue.global())
-                    .sink(
-                        receiveCompletion: { completion in
-                            if case let .failure(error) = completion {
-                                promise(.failure(error))
-                            }
-                        },
-                        receiveValue: { mediaEntry in
-                            promise(.success(mediaEntry))
-                        }
-                    )
-                    .store(in: &cancellables)
-                }
+                promise(.success(image))
             }
+        }
+        .flatMap { [weak self] image -> AnyPublisher<MediaEntry, MediaFileWorkerError> in
+            guard let self else {
+                return Fail(error: MediaFileWorkerError.noSelfFound)
+                    .eraseToAnyPublisher()
+            }
+            
+            return save(image: image, forGeoEntry: geoEntry)
         }
         .eraseToAnyPublisher()
     }
+    
+    // MARK: - Delete Media
     
     func deleteMedia(_ entry: MediaEntry, completionHandler: @escaping () -> Void) {
         CoreStoreDefaults.dataStack.perform(
@@ -257,6 +310,8 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
             }
         )
     }
+    
+    // MARK: - Helper Functions
     
     private func getDocumentsDirectory(appending fileName: String) -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)

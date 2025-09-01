@@ -59,6 +59,7 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
 // MARK: - Private selector methods
 @objc private extension CreateEditEntryViewController {
     func dismissSheet() {
+        interactor?.clearMediaInfo()
         dismiss(animated: true)
     }
     

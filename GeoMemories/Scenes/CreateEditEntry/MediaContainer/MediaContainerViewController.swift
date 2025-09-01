@@ -318,34 +318,41 @@ extension MediaContainerViewController: UICollectionViewDelegate {
     }
 }
 
+private extension MediaContainerViewController {
+    func processSaveAction(
+        for publisher: AnyPublisher<MediaEntry, MediaFileWorkerError>
+    ) {
+        publisher
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    if case let .failure(error) = completion {
+                        self.logger.error("Error saving media: \(error)")
+                    }
+                },
+                receiveValue: { entry in
+                    self.items.append(entry)
+                    self.collectionView.insertItems(
+                        at: [IndexPath(
+                            item: self.items.count - 1,
+                            section: 0
+                        )]
+                    )
+                    self.updateCollectionViewHeight()
+                }
+            )
+            .store(in: &cancellables)
+    }
+}
+
 extension MediaContainerViewController: PHPickerViewControllerDelegate {
     func picker(
         _ picker: PHPickerViewController,
         didFinishPicking results: [PHPickerResult]
     ) {
         results.forEach { result in
-            worker.saveMedia(forEntry: nil, result: result)
-                .receive(on: DispatchQueue.main)
-                .sink(
-                    receiveCompletion: { completion in
-                        if case let .failure(error) = completion {
-                            self.logger.error("Error saving media: \(error)")
-                        }
-                    },
-                    receiveValue: { entry in
-                        self.items.append(entry)
-                        self.collectionView.insertItems(
-                            at: [IndexPath(
-                                item: self.items.count - 1,
-                                section: 0
-                            )]
-                        )
-                        self.updateCollectionViewHeight()
-                    }
-                )
-                .store(in: &cancellables)
+            processSaveAction(for: worker.saveMedia(forEntry: nil, result: result))
         }
-        
         
         picker.dismiss(animated: true)
     }
@@ -356,7 +363,11 @@ extension MediaContainerViewController: UIImagePickerControllerDelegate & UINavi
         _ picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
     ) {
+        guard let image = info[.originalImage] as? UIImage else { return }
         
+        processSaveAction(for: worker.saveMedia(forEntry: geoEntry, image: image))
+        
+        dismiss(animated: true)
     }
 }
 

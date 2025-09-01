@@ -14,6 +14,23 @@
       },
       "shouldTranslate" : false
     },
+    "NSCameraUsageDescription" : {
+      "comment" : "Privacy - Camera Usage Description",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We will only use camera for taking a photo for an entry"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приложение использует камеру только для того, чтобы добавлять снимки напрямую в запись"
+          }
+        }
+      }
+    },
     "NSLocationWhenInUseUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -33,12 +50,18 @@
     },
     "NSPhotoLibraryAddUsageDescription" : {
       "comment" : "Privacy - Photo Library Additions Usage Description",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "NSPhotoLibraryUsageDescription"
+            "state" : "translated",
+            "value" : "To add photos from your library to the memory entry, we need a special permissions to access your Photos app on demand"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы добавить фотографии из вашей библиотеки в запись, нам нужен доступ к приложению «Фото»"
           }
         }
       }
@@ -50,6 +73,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "To add photos from your library to the memory entry, we need a special permissions to access your Photos app on demand"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы добавить фотографии из вашей библиотеки в запись, нам нужен доступ к приложению «Фото»"
           }
         }
       }
