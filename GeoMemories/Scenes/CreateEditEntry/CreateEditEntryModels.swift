@@ -81,4 +81,16 @@ enum CreateEditEntry {
             let description: String
         }
     }
+    
+    enum ConfigureInitial {
+        struct Response {
+            let title: String
+            let description: String
+        }
+        
+        struct ViewModel {
+            let title: String
+            let description: String
+        }
+    }
 }

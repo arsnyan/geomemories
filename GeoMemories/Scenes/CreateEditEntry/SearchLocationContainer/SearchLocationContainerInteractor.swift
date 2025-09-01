@@ -56,9 +56,11 @@ class SearchLocationContainerInteractor: SearchLocationContainerBusinessLogic, S
                 latitude: existing.latitude,
                 longitude: existing.longitude
             )
-            self?.presenter?.presentSelectedLocation(
-                response: .successWithCurrentLocation(location: location)
-            )
+            DispatchQueue.main.async {
+                self?.presenter?.presentSelectedLocation(
+                    response: .successWithCurrentLocation(location: location)
+                )
+            }
         } completion: { [weak self] result in
             if case let .failure(error) = result {
                 self?.logger.error("Something went wrong while fetching geo entry: \(error)")

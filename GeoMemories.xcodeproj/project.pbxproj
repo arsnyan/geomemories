@@ -44,6 +44,7 @@
 		2E78D4362E5B701600AE99A4 /* SearchLocationContainerInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D42C2E5B701600AE99A4 /* SearchLocationContainerInteractor.swift */; };
 		2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78D4302E5B701600AE99A4 /* SearchLocationContainerViewController.swift */; };
 		2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E96C9682E54E82A00320E27 /* StorageService.swift */; };
+		2E9838F62E6615560005DBF2 /* MemoryCalloutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9838F52E6615560005DBF2 /* MemoryCalloutDetailView.swift */; };
 		2ED101382E60AEE60078AFE6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED101372E60AEE60078AFE6 /* Constants.swift */; };
 		2ED1013A2E60DF330078AFE6 /* MediaFileWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED101392E60DF330078AFE6 /* MediaFileWorker.swift */; };
 		2ED1013C2E60EA980078AFE6 /* Dependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED1013B2E60EA980078AFE6 /* Dependencies.swift */; };
@@ -109,6 +110,7 @@
 		2E78D42F2E5B701600AE99A4 /* SearchLocationContainerRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerRouter.swift; sourceTree = "<group>"; };
 		2E78D4302E5B701600AE99A4 /* SearchLocationContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationContainerViewController.swift; sourceTree = "<group>"; };
 		2E96C9682E54E82A00320E27 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		2E9838F52E6615560005DBF2 /* MemoryCalloutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryCalloutDetailView.swift; sourceTree = "<group>"; };
 		2ED101372E60AEE60078AFE6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		2ED101392E60DF330078AFE6 /* MediaFileWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaFileWorker.swift; sourceTree = "<group>"; };
 		2ED1013B2E60EA980078AFE6 /* Dependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dependencies.swift; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 			children = (
 				2E713D462E55CCC8002087EB /* MemoryAnnotation.swift */,
 				2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */,
+				2E9838F52E6615560005DBF2 /* MemoryCalloutDetailView.swift */,
 			);
 			path = MemoryAnnotation;
 			sourceTree = "<group>";
@@ -264,6 +267,7 @@
 			isa = PBXGroup;
 			children = (
 				2E713D612E571F52002087EB /* RoundedCornersTextField.swift */,
+				2EE3D9342E637BD800240D3D /* MediaPlaceholderViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -311,7 +315,6 @@
 			isa = PBXGroup;
 			children = (
 				2ED93D802E5DFE2C00115576 /* MediaContainerViewController.swift */,
-				2EE3D9342E637BD800240D3D /* MediaPlaceholderViewCell.swift */,
 			);
 			path = MediaContainer;
 			sourceTree = "<group>";
@@ -494,6 +497,7 @@
 				2ED101382E60AEE60078AFE6 /* Constants.swift in Sources */,
 				2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */,
 				2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */,
+				2E9838F62E6615560005DBF2 /* MemoryCalloutDetailView.swift in Sources */,
 				2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */,
 				2ED1013C2E60EA980078AFE6 /* Dependencies.swift in Sources */,
 				2E245CED2E5358B90085B958 /* MediaEntry.swift in Sources */,

@@ -11,15 +11,13 @@ import MapKit
 class MemoryAnnotationView: MKAnnotationView {
     static let reuseIdentifier = "MemoryAnnotationView"
     
+    private let detailView = MemoryCalloutDetailView()
+    
     override var annotation: MKAnnotation? {
         didSet {
             guard let memoryAnnotation = annotation as? MemoryAnnotation else { return }
             
-            // swiftlint:disable line_length
-            // TODO: - really would rather make a custom clustering image — https://medium.com/mobilepeople/enhance-your-map-experience-with-annotations-13e28507f892
-            clusteringIdentifier = "memories"
-            
-            if let baseImage = memoryAnnotation.image {
+            if let baseImage = memoryAnnotation.icon {
                 image = circularImage(
                     from: baseImage,
                     size: CGSize(
@@ -27,21 +25,31 @@ class MemoryAnnotationView: MKAnnotationView {
                         height: 48
                     )
                 )
-//                markerTintColor = .clear
-//                glyphTintColor = nil
             } else {
                 image = UIImage(systemName: "xmark.circle.fill")
-//                glyphImage = nil
-//                markerTintColor = .systemRed
             }
+            
+            detailView.configure(with: memoryAnnotation)
         }
     }
     
     override init(annotation: MKAnnotation? = nil, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
         canShowCallout = true
-        // detailCalloutAccessoryView = 
-        rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+        detailCalloutAccessoryView = detailView
+        
+        var config = UIButton.Configuration.glassOrPlain()
+        config.image = UIImage(systemName: "square.and.pencil")
+        let editButton = UIButton(configuration: config)
+        editButton.sizeToFit()
+        
+        var seeFullConfig = config
+        seeFullConfig.image = UIImage(systemName: "arrow.up.left.and.arrow.down.right")
+        let seeFullButton = UIButton(configuration: seeFullConfig)
+        seeFullButton.sizeToFit()
+        
+        leftCalloutAccessoryView = editButton
+        rightCalloutAccessoryView = seeFullButton
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -60,6 +68,16 @@ class MemoryAnnotationView: MKAnnotationView {
             UIColor.systemGray6.setStroke()
             circlePath.lineWidth = 1
             circlePath.stroke()
+        }
+    }
+}
+
+extension UIButton.Configuration {
+    static func glassOrPlain() -> UIButton.Configuration {
+        if #available(iOS 26.0, *) {
+            glass()
+        } else {
+            plain()
         }
     }
 }

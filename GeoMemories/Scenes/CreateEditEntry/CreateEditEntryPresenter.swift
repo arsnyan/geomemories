@@ -10,6 +10,7 @@ import Foundation
 
 protocol CreateEditEntryPresentationLogic {
     func presentNavigationBarTitle(response: CreateEditEntry.ConfigurePurpose.Response)
+    func presentInitialValues(response: CreateEditEntry.ConfigureInitial.Response)
     func unpresentCurrentView()
 }
 
@@ -25,6 +26,15 @@ class CreateEditEntryPresenter: CreateEditEntryPresentationLogic {
         
         let viewModel = CreateEditEntry.ConfigurePurpose.ViewModel(title: title)
         viewController?.configureNavigationBarTitle(viewModel: viewModel)
+    }
+    
+    func presentInitialValues(response: CreateEditEntry.ConfigureInitial.Response) {
+        viewController?.setInitialTexts(
+            viewModel: .init(
+                title: response.title,
+                description: response.description
+            )
+        )
     }
     
     func unpresentCurrentView() {

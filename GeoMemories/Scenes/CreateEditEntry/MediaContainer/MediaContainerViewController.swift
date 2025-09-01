@@ -51,14 +51,9 @@ class MediaContainerViewController: UIViewController {
         setupUI()
         
         if let geoEntry {
-            Dependencies.dataStack.perform { [weak self] transaction in
-                guard let existing = transaction.fetchExisting(geoEntry) else { return }
-                self?.items = Array(existing.mediaIds)
-                self?.collectionView.reloadData()
-            } completion: { [weak self] result in
-                if case let .failure(error) = result {
-                    self?.logger.error("Failed to fetch geo entry: \(error)")
-                }
+            if let existing = Dependencies.dataStack.fetchExisting(geoEntry) {
+                items = Array(existing.mediaIds)
+                collectionView.reloadData()
             }
         }
     }
@@ -250,7 +245,7 @@ extension MediaContainerViewController: UICollectionViewDataSource {
         }
         
         let item = items[indexPath.item]
-        cell.setup(with: item)
+        cell.setup(with: item, isRemovable: true)
         
         return cell
     }

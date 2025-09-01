@@ -30,18 +30,8 @@ class MediaPlaceholderViewCell: UICollectionViewCell {
         
         addSubview(imageView)
         
-        let crossImage = UIImage(systemName: "xmark.circle.fill")
-        let crossImageView = UIImageView(image: crossImage)
-        crossImageView.tintColor = .systemGray
-        imageView.addSubview(crossImageView)
-        
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-        }
-        
-        crossImageView.snp.makeConstraints { make in
-            make.size.equalTo(16)
-            make.top.trailing.equalToSuperview().inset(4)
         }
     }
     
@@ -56,7 +46,7 @@ class MediaPlaceholderViewCell: UICollectionViewCell {
         cancellable = nil
     }
     
-    func setup(with mediaEntry: MediaEntry) {
+    func setup(with mediaEntry: MediaEntry, isRemovable: Bool) {
         cancellable = worker.loadMediaPlaceholder(from: mediaEntry)
             .receive(on: DispatchQueue.main)
             .sink(
@@ -67,6 +57,19 @@ class MediaPlaceholderViewCell: UICollectionViewCell {
                 },
                 receiveValue: { image in
                     self.imageView.image = image
+                    
+                    if isRemovable {
+                        let crossImage = UIImage(systemName: "xmark.circle.fill")
+                        let crossImageView = UIImageView(image: crossImage)
+                        crossImageView.tintColor = .systemGray
+                        
+                        self.imageView.addSubview(crossImageView)
+                        
+                        crossImageView.snp.makeConstraints { make in
+                            make.size.equalTo(16)
+                            make.top.trailing.equalToSuperview().inset(4)
+                        }
+                    }
                 }
             )
     }

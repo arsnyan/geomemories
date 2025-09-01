@@ -66,14 +66,25 @@ class HomePresenter: HomePresentationLogic {
         case .loading:
             viewController?.displayMapEntries(viewModel: .loading)
         case .success(let entries):
-            Dependencies.dataStack.reactive.perform { transaction -> [(lat: Double, long: Double, title: String, mediaEntry: MediaEntry?)] in
+            struct EntryDto {
+                let entryRef: GeoEntry
+                let title: String
+                let description: String
+                let lat: Double
+                let lng: Double
+                let media: [MediaEntry]
+            }
+            
+            Dependencies.dataStack.reactive.perform { transaction -> [EntryDto] in
                 let existing = entries.compactMap { transaction.fetchExisting($0) }
-                return existing.map {
-                    entry -> (lat: Double, long: Double, title: String, mediaEntry: MediaEntry?) in return (
-                        entry.latitude,
-                        entry.longitude,
-                        entry.title,
-                        entry.mediaIds.first
+                return existing.map { entry -> EntryDto in
+                    return EntryDto(
+                        entryRef: entry,
+                        title: entry.title,
+                        description: entry.description,
+                        lat: entry.latitude,
+                        lng: entry.longitude,
+                        media: Array(entry.mediaIds)
                     )
                 }
             }
@@ -83,33 +94,42 @@ class HomePresenter: HomePresentationLogic {
                     return Just([]).eraseToAnyPublisher()
                 }
                 
-                let publishers = entriesData.map { lat, lng, title, media in
-                    if let media {
+                let publishers = entriesData.map { entry in
+                    if let media = entry.media.first {
                         return Dependencies.mediaFileWorker.loadMediaPlaceholder(from: media)
                             .map { image in
                                 return MemoryAnnotation(
-                                    latitude: lat,
-                                    longitude: lng,
-                                    title: title,
-                                    image: image
+                                    geoEntry: entry.entryRef,
+                                    title: entry.title,
+                                    description: entry.description,
+                                    latitude: entry.lat,
+                                    longitude: entry.lng,
+                                    media: entry.media,
+                                    icon: image
                                 )
                             }
                             .replaceError(
                                 with: MemoryAnnotation(
-                                    latitude: lat,
-                                    longitude: lng,
-                                    title: title,
-                                    image: UIImage(systemName: "person.crop.circle.badge.exclamationmark.fill")!
+                                    geoEntry: entry.entryRef,
+                                    title: entry.title,
+                                    description: entry.description,
+                                    latitude: entry.lat,
+                                    longitude: entry.lng,
+                                    media: [],
+                                    icon: nil
                                 )
                             )
                             .eraseToAnyPublisher()
                     } else {
                         return Just(
                             MemoryAnnotation(
-                                latitude: lat,
-                                longitude: lng,
-                                title: title,
-                                image: UIImage(systemName: "person.crop.circle.badge.exclamationmark.fill")!
+                                geoEntry: entry.entryRef,
+                                title: entry.title,
+                                description: entry.description,
+                                latitude: entry.lat,
+                                longitude: entry.lng,
+                                media: [],
+                                icon: nil
                             )
                         )
                         .eraseToAnyPublisher()

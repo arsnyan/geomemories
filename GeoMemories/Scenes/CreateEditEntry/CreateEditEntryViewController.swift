@@ -15,6 +15,7 @@ protocol CreateEditEntryDisplayLogic: AnyObject {
     func configureNavigationBarTitle(
         viewModel: CreateEditEntry.ConfigurePurpose.ViewModel
     )
+    func setInitialTexts(viewModel: CreateEditEntry.ConfigureInitial.ViewModel)
     
     func dismissView()
 }
@@ -54,6 +55,11 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
     func dismissView() {
         dismiss(animated: true)
     }
+    
+    func setInitialTexts(viewModel: CreateEditEntry.ConfigureInitial.ViewModel) {
+        entryTitleTextField.text = viewModel.title
+        entryDescriptionTextView.text = viewModel.description
+    }
 }
 
 // MARK: - Private selector methods
@@ -77,6 +83,7 @@ extension CreateEditEntryViewController: CreateEditEntryDisplayLogic {
 private extension CreateEditEntryViewController {
     func setupUI() {
         interactor?.provideNavigationBarTitle()
+        interactor?.provideInitialValues()
         view.backgroundColor = .systemBackground
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(

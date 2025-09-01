@@ -14,6 +14,7 @@ import CoreStore
 
 protocol CreateEditEntryBusinessLogic: SearchLocationContainerDelegate {
     func provideNavigationBarTitle()
+    func provideInitialValues()
     func updateMediaItems(request: CreateEditEntry.UpdateMedia.Request)
     func saveEntry(request: CreateEditEntry.Save.Request)
     
@@ -40,11 +41,25 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
     
     func provideNavigationBarTitle() {
         presenter?.presentNavigationBarTitle(response: .init(isEditMode: entry != nil))
+    }
+    
+    func provideInitialValues() {
         if let entry {
             Dependencies.dataStack.perform { [weak self] transaction in
                 guard let existing = transaction.fetchExisting(entry) else { return }
                 self?.mediaItems = Array(existing.mediaIds)
                 self?.selectedCoordinates = .init(latitude: existing.latitude, longitude: existing.longitude)
+                
+                let existingTitle = existing.title
+                let existingDescription = existing.description
+                DispatchQueue.main.async {
+                    self?.presenter?.presentInitialValues(
+                        response: .init(
+                            title: existingTitle,
+                            description: existingDescription
+                        )
+                    )
+                }
             } completion: { [weak self] result in
                 if case let .failure(error) = result {
                     self?.logger.error("Couldn't fetch existing entry: \(error)")
@@ -88,8 +103,7 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
             },
             completion: { [weak self] completion in
                 switch completion {
-                case .success(let geoEntry):
-                    self?.entry = geoEntry
+                case .success(_):
                     self?.presenter?.unpresentCurrentView()
                     NotificationCenter.default.post(name: NSNotification.Name("EntriesUpdated"), object: nil)
                 case .failure(let error):
@@ -102,7 +116,10 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
     func clearMediaInfo() {
         CoreStoreDefaults.dataStack.perform(
             asynchronous: { [weak self] transaction in
-                self?.mediaItems.forEach { mediaEntry in
+                guard let self else { return }
+                guard entry == nil else { return }
+                
+                mediaItems.forEach { mediaEntry in
                     let existing = transaction.fetchExisting(mediaEntry)
                     transaction.delete(existing)
                 }

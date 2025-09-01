@@ -8,13 +8,30 @@
 import MapKit
 
 class MemoryAnnotation: NSObject, MKAnnotation {
+    var entryTitle: String?
+    var entryDescription: String
     var coordinate: CLLocationCoordinate2D
-    var title: String?
-    var image: UIImage?
+    var media: [MediaEntry]
+    var icon: UIImage?
+    // I'll keep a ref to a geo entry here despite duplicating all the properties,
+    // so that I don't perform unnecessary storage operations in CoreStore for no gain.
+    var geoEntry: GeoEntry
     
-    init(latitude: Double, longitude: Double, title: String?, image: UIImage? = nil) {
+    init(
+        geoEntry: GeoEntry,
+        title: String?,
+        description: String,
+        latitude: Double,
+        longitude: Double,
+        media: [MediaEntry],
+        icon: UIImage? = nil
+    ) {
+        self.geoEntry = geoEntry
+        self.entryTitle = title
+        self.entryDescription = description
         self.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        self.title = title
-        self.image = image
+        self.media = media
+        
+        self.icon = icon
     }
 }

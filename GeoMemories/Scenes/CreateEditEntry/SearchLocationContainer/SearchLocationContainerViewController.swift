@@ -27,26 +27,30 @@ class SearchLocationContainerViewController: UIViewController {
     private var endEditingUserInitiated: Bool = true
     private var locationRows: [LocationCellViewModelProtocol] = [] {
         didSet {
-            resultsTable.reloadData()
-            
-            let newTableHeight = locationRows.map(\.height).reduce(0, +)
-            
-            resultsTable.snp.updateConstraints { make in
-                make.height.equalTo(newTableHeight)
-            }
-            
-            UIView.animate(
-                withDuration: 0.3,
-                delay: 0,
-                usingSpringWithDamping: 0.8,
-                initialSpringVelocity: 0
-            ) {
-                self.parent?.view.layoutIfNeeded()
-            } completion: { _ in
-                if self.locationRows.isEmpty {
-                    self.container.backgroundColor = .clear
-                } else {
-                    self.container.backgroundColor = .gray.withAlphaComponent(0.05)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                
+                resultsTable.reloadData()
+                
+                let newTableHeight = locationRows.map(\.height).reduce(0, +)
+                
+                resultsTable.snp.updateConstraints { make in
+                    make.height.equalTo(newTableHeight)
+                }
+                
+                UIView.animate(
+                    withDuration: 0.3,
+                    delay: 0,
+                    usingSpringWithDamping: 0.8,
+                    initialSpringVelocity: 0
+                ) {
+                    self.parent?.view.layoutIfNeeded()
+                } completion: { _ in
+                    if self.locationRows.isEmpty {
+                        self.container.backgroundColor = .clear
+                    } else {
+                        self.container.backgroundColor = .gray.withAlphaComponent(0.05)
+                    }
                 }
             }
         }
