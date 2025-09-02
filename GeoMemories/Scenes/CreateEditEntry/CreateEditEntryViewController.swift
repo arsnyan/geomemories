@@ -26,6 +26,9 @@ class CreateEditEntryViewController: UIViewController {
     var router: (NSObjectProtocol & CreateEditEntryRoutingLogic & CreateEditEntryDataPassing)?
     
     // MARK: - UI Components
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    
     private var searchLocation: SearchLocationContainerViewController!
     private var entryTitleTextField: RoundedCornersTextField!
     
@@ -98,6 +101,17 @@ private extension CreateEditEntryViewController {
             action: #selector(saveEntry)
         )
         
+        view.addSubview(scrollView)
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        scrollView.addSubview(contentView)
+        contentView.snp.makeConstraints { make in
+            make.edges.equalTo(scrollView.contentLayoutGuide)
+            make.width.equalTo(scrollView.frameLayoutGuide)
+        }
+        
         setupSearchLocationContainer()
         setupTitleTextField()
         setupDescriptionContainer()
@@ -112,7 +126,7 @@ private extension CreateEditEntryViewController {
         )
         searchLocation.interactor?.delegate = interactor
         addChild(searchLocation)
-        view.addSubview(searchLocation.view)
+        contentView.addSubview(searchLocation.view)
         
         searchLocation.view.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
@@ -140,7 +154,7 @@ private extension CreateEditEntryViewController {
         entryTitleTextField.leftView = imageView
         entryTitleTextField.leftViewMode = .always
         
-        view.addSubview(entryTitleTextField)
+        contentView.addSubview(entryTitleTextField)
         
         entryTitleTextField.snp.makeConstraints { make in
             make.top.equalTo(searchLocation.view.snp.bottom).offset(16)
@@ -203,7 +217,7 @@ private extension CreateEditEntryViewController {
         entryDescriptionContainer.layer.cornerRadius = Constants.cornerRadius
         entryDescriptionContainer.layer.masksToBounds = true
         
-        view.addSubview(entryDescriptionContainer)
+        contentView.addSubview(entryDescriptionContainer)
         
         entryDescriptionContainer.snp.makeConstraints { make in
             make.top.equalTo(entryTitleTextField.snp.bottom).offset(16)
@@ -216,12 +230,13 @@ private extension CreateEditEntryViewController {
         mediaContainer.delegate = self
         mediaContainer.geoEntry = router?.dataStore?.entry
         addChild(mediaContainer)
-        view.addSubview(mediaContainer.view)
+        contentView.addSubview(mediaContainer.view)
         
         mediaContainer.view.snp.makeConstraints { make in
             make.top.equalTo(entryDescriptionContainer.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
             mediaContainerHeightConstraint = make.height.equalTo(0).constraint
+            make.bottom.equalToSuperview().inset(16)
         }
         mediaContainer.didMove(toParent: self)
     }

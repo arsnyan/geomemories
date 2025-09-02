@@ -26,6 +26,7 @@
 		2E245CFE2E539A630085B958 /* HomePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF62E539A630085B958 /* HomePresenter.swift */; };
 		2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF92E539A630085B958 /* HomeWorker.swift */; };
 		2E245D012E539ABD0085B958 /* HomeConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245D002E539ABD0085B958 /* HomeConfigurator.swift */; };
+		2E2602772E66EF360010BB13 /* EntryDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2602762E66EF360010BB13 /* EntryDetailsViewController.swift */; };
 		2E713D472E55CCC8002087EB /* MemoryAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D462E55CCC8002087EB /* MemoryAnnotation.swift */; };
 		2E713D492E55CD2B002087EB /* MemoryAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */; };
 		2E713D512E55F6FB002087EB /* CreateEditEntryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4D2E55F6FB002087EB /* CreateEditEntryPresenter.swift */; };
@@ -92,6 +93,7 @@
 		2E245CF82E539A630085B958 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		2E245CF92E539A630085B958 /* HomeWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWorker.swift; sourceTree = "<group>"; };
 		2E245D002E539ABD0085B958 /* HomeConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeConfigurator.swift; sourceTree = "<group>"; };
+		2E2602762E66EF360010BB13 /* EntryDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailsViewController.swift; sourceTree = "<group>"; };
 		2E713D462E55CCC8002087EB /* MemoryAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryAnnotation.swift; sourceTree = "<group>"; };
 		2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryAnnotationView.swift; sourceTree = "<group>"; };
 		2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryInteractor.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 		2E245CF22E539A490085B958 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				2E2602752E66EF1B0010BB13 /* EntryDetails */,
 				2E713D632E576371002087EB /* LocationCell */,
 				2E713D4A2E55F6E6002087EB /* CreateEditEntry */,
 				2E245CF32E539A510085B958 /* Home */,
@@ -235,6 +238,14 @@
 				2E245D002E539ABD0085B958 /* HomeConfigurator.swift */,
 			);
 			path = Home;
+			sourceTree = "<group>";
+		};
+		2E2602752E66EF1B0010BB13 /* EntryDetails */ = {
+			isa = PBXGroup;
+			children = (
+				2E2602762E66EF360010BB13 /* EntryDetailsViewController.swift */,
+			);
+			path = EntryDetails;
 			sourceTree = "<group>";
 		};
 		2E713D452E55CCAC002087EB /* MemoryAnnotation */ = {
@@ -477,6 +488,7 @@
 				2E713D672E576397002087EB /* LocationCellViewModel.swift in Sources */,
 				2E713D472E55CCC8002087EB /* MemoryAnnotation.swift in Sources */,
 				2E713D512E55F6FB002087EB /* CreateEditEntryPresenter.swift in Sources */,
+				2E2602772E66EF360010BB13 /* EntryDetailsViewController.swift in Sources */,
 				2ED1013A2E60DF330078AFE6 /* MediaFileWorker.swift in Sources */,
 				2E713D522E55F6FB002087EB /* CreateEditEntryRouter.swift in Sources */,
 				2E713D532E55F6FB002087EB /* CreateEditEntryModels.swift in Sources */,
