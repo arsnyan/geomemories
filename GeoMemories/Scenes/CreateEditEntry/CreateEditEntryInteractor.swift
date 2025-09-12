@@ -103,7 +103,7 @@ class CreateEditEntryInteractor: CreateEditEntryBusinessLogic, CreateEditEntryDa
             },
             completion: { [weak self] completion in
                 switch completion {
-                case .success(_):
+                case .success:
                     self?.presenter?.unpresentCurrentView()
                     NotificationCenter.default.post(name: NSNotification.Name("EntriesUpdated"), object: nil)
                 case .failure(let error):

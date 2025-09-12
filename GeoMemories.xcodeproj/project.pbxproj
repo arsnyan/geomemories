@@ -12,7 +12,6 @@
 		2E245CA82E5317900085B958 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CA32E5317900085B958 /* LaunchScreen.storyboard */; };
 		2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245C9F2E5317900085B958 /* AppDelegate.swift */; };
 		2E245CAA2E5317900085B958 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CA42E5317900085B958 /* SceneDelegate.swift */; };
-		2E245CB72E531C120085B958 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CB62E531C120085B958 /* KeychainAccess */; };
 		2E245CBB2E531F860085B958 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CBA2E531F860085B958 /* SnapKit */; };
 		2E245CC12E5321A70085B958 /* CoreStore in Frameworks */ = {isa = PBXBuildFile; productRef = 2E245CC02E5321A70085B958 /* CoreStore */; };
 		2E245CC82E5336260085B958 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2E245CC72E5336260085B958 /* Localizable.xcstrings */; };
@@ -142,7 +141,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2E245CB72E531C120085B958 /* KeychainAccess in Frameworks */,
 				2E245CC12E5321A70085B958 /* CoreStore in Frameworks */,
 				2E245CBB2E531F860085B958 /* SnapKit in Frameworks */,
 			);
@@ -404,7 +402,6 @@
 			);
 			name = GeoMemories;
 			packageProductDependencies = (
-				2E245CB62E531C120085B958 /* KeychainAccess */,
 				2E245CBA2E531F860085B958 /* SnapKit */,
 				2E245CC02E5321A70085B958 /* CoreStore */,
 			);
@@ -486,7 +483,6 @@
 			mainGroup = 2E245C622E5316710085B958;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2E245CB52E531C120085B958 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				2E245CB82E531C540085B958 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				2E245CB92E531F860085B958 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				2E245CBF2E5321A70085B958 /* XCRemoteSwiftPackageReference "CoreStore" */,
@@ -957,14 +953,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2E245CB52E531C120085B958 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		2E245CB82E531C540085B958 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
@@ -992,11 +980,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2E245CB62E531C120085B958 /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2E245CB52E531C120085B958 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
 		2E245CBA2E531F860085B958 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2E245CB92E531F860085B958 /* XCRemoteSwiftPackageReference "SnapKit" */;

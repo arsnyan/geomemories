@@ -95,7 +95,10 @@ extension MemoryCalloutDetailView: UICollectionViewDataSource {
         media.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: MediaPlaceholderViewCell.reuseIdentifier,
             for: indexPath

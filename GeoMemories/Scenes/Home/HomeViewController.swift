@@ -11,7 +11,6 @@ import MapKit
 
 protocol HomeDisplayLogic: AnyObject {
     func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel)
-    // TODO: - Make show details functionality and `edit entry` action
     func displayMapEntries(viewModel: Home.ShowMapEntries.ViewModel)
 }
 

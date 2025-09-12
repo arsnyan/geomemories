@@ -60,7 +60,6 @@ class HomePresenter: HomePresentationLogic {
         }
     }
     
-    // swiftlint:disable large_tuple
     func presentMapEntries(response: Home.ShowMapEntries.Response) {
         switch response {
         case .loading:
