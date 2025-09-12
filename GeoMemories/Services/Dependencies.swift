@@ -17,4 +17,5 @@ struct Dependencies {
     static let mediaFileWorker: MediaFileWorkerProtocol = MediaFileWorker(
         storageService: storageService
     )
+    static let wikipediaService: WikipediaServiceProtocol = WikipediaService()
 }

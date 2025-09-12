@@ -89,7 +89,7 @@ extension HomeViewController: MKMapViewDelegate {
         if control == view.leftCalloutAccessoryView {
             router?.routeToCreateEditEntry(geoEntry: annotation.geoEntry)
         } else {
-            // TODO: - Route to Details View
+            router?.routeToEntryDetails(geoEntry: annotation.geoEntry)
         }
     }
 }

@@ -257,6 +257,12 @@
         }
       }
     },
+    "mapViewSection" : {
+
+    },
+    "mediaCardsSection" : {
+
+    },
     "noLocalizedErrorMessage" : {
       "localizations" : {
         "en" : {
@@ -288,6 +294,9 @@
           }
         }
       }
+    },
+    "placeInfoSection" : {
+
     },
     "retry" : {
       "localizations" : {
@@ -336,6 +345,9 @@
           }
         }
       }
+    },
+    "userInfoSection" : {
+
     }
   },
   "version" : "1.1"

@@ -27,6 +27,14 @@
 		2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245CF92E539A630085B958 /* HomeWorker.swift */; };
 		2E245D012E539ABD0085B958 /* HomeConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E245D002E539ABD0085B958 /* HomeConfigurator.swift */; };
 		2E2602772E66EF360010BB13 /* EntryDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2602762E66EF360010BB13 /* EntryDetailsViewController.swift */; };
+		2E2602792E66F6980010BB13 /* EntryDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2602782E66F6980010BB13 /* EntryDetailsViewModel.swift */; };
+		2E26027C2E66F71A0010BB13 /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E26027B2E66F71A0010BB13 /* Box.swift */; };
+		2E26027F2E66F83E0010BB13 /* MediaCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E26027E2E66F83E0010BB13 /* MediaCardViewModel.swift */; };
+		2E2602812E66FAF90010BB13 /* WikipediaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2602802E66FAF90010BB13 /* WikipediaService.swift */; };
+		2E2602832E6700170010BB13 /* WikiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2602822E6700170010BB13 /* WikiModel.swift */; };
+		2E2602862E673E090010BB13 /* TextCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2602852E673E090010BB13 /* TextCellView.swift */; };
+		2E26028A2E6746FB0010BB13 /* MediaCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2602892E6746FB0010BB13 /* MediaCardView.swift */; };
+		2E26028D2E6747BA0010BB13 /* MapCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E26028C2E6747BA0010BB13 /* MapCellView.swift */; };
 		2E713D472E55CCC8002087EB /* MemoryAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D462E55CCC8002087EB /* MemoryAnnotation.swift */; };
 		2E713D492E55CD2B002087EB /* MemoryAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */; };
 		2E713D512E55F6FB002087EB /* CreateEditEntryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E713D4D2E55F6FB002087EB /* CreateEditEntryPresenter.swift */; };
@@ -94,6 +102,14 @@
 		2E245CF92E539A630085B958 /* HomeWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWorker.swift; sourceTree = "<group>"; };
 		2E245D002E539ABD0085B958 /* HomeConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeConfigurator.swift; sourceTree = "<group>"; };
 		2E2602762E66EF360010BB13 /* EntryDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailsViewController.swift; sourceTree = "<group>"; };
+		2E2602782E66F6980010BB13 /* EntryDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailsViewModel.swift; sourceTree = "<group>"; };
+		2E26027B2E66F71A0010BB13 /* Box.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
+		2E26027E2E66F83E0010BB13 /* MediaCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCardViewModel.swift; sourceTree = "<group>"; };
+		2E2602802E66FAF90010BB13 /* WikipediaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikipediaService.swift; sourceTree = "<group>"; };
+		2E2602822E6700170010BB13 /* WikiModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiModel.swift; sourceTree = "<group>"; };
+		2E2602852E673E090010BB13 /* TextCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextCellView.swift; sourceTree = "<group>"; };
+		2E2602892E6746FB0010BB13 /* MediaCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCardView.swift; sourceTree = "<group>"; };
+		2E26028C2E6747BA0010BB13 /* MapCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCellView.swift; sourceTree = "<group>"; };
 		2E713D462E55CCC8002087EB /* MemoryAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryAnnotation.swift; sourceTree = "<group>"; };
 		2E713D482E55CD2B002087EB /* MemoryAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryAnnotationView.swift; sourceTree = "<group>"; };
 		2E713D4B2E55F6FB002087EB /* CreateEditEntryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEditEntryInteractor.swift; sourceTree = "<group>"; };
@@ -171,6 +187,7 @@
 		2E245CA52E5317900085B958 /* GeoMemories */ = {
 			isa = PBXGroup;
 			children = (
+				2E26027A2E66F7120010BB13 /* Helpers */,
 				2ED101362E60AED60078AFE6 /* Styles */,
 				2E713D602E571F37002087EB /* Views */,
 				2E96C9672E54E81600320E27 /* Services */,
@@ -210,6 +227,7 @@
 			children = (
 				2E245CEA2E534D430085B958 /* GeoEntry.swift */,
 				2E245CEC2E5358B90085B958 /* MediaEntry.swift */,
+				2E2602822E6700170010BB13 /* WikiModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -243,9 +261,46 @@
 		2E2602752E66EF1B0010BB13 /* EntryDetails */ = {
 			isa = PBXGroup;
 			children = (
+				2E26028B2E6747AE0010BB13 /* MapCell */,
+				2E2602842E673DF70010BB13 /* TextCell */,
+				2E26027D2E66F8350010BB13 /* MediaCard */,
 				2E2602762E66EF360010BB13 /* EntryDetailsViewController.swift */,
+				2E2602782E66F6980010BB13 /* EntryDetailsViewModel.swift */,
 			);
 			path = EntryDetails;
+			sourceTree = "<group>";
+		};
+		2E26027A2E66F7120010BB13 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				2E26027B2E66F71A0010BB13 /* Box.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		2E26027D2E66F8350010BB13 /* MediaCard */ = {
+			isa = PBXGroup;
+			children = (
+				2E26027E2E66F83E0010BB13 /* MediaCardViewModel.swift */,
+				2E2602892E6746FB0010BB13 /* MediaCardView.swift */,
+			);
+			path = MediaCard;
+			sourceTree = "<group>";
+		};
+		2E2602842E673DF70010BB13 /* TextCell */ = {
+			isa = PBXGroup;
+			children = (
+				2E2602852E673E090010BB13 /* TextCellView.swift */,
+			);
+			path = TextCell;
+			sourceTree = "<group>";
+		};
+		2E26028B2E6747AE0010BB13 /* MapCell */ = {
+			isa = PBXGroup;
+			children = (
+				2E26028C2E6747BA0010BB13 /* MapCellView.swift */,
+			);
+			path = MapCell;
 			sourceTree = "<group>";
 		};
 		2E713D452E55CCAC002087EB /* MemoryAnnotation */ = {
@@ -310,6 +365,7 @@
 			children = (
 				2E96C9682E54E82A00320E27 /* StorageService.swift */,
 				2ED1013B2E60EA980078AFE6 /* Dependencies.swift */,
+				2E2602802E66FAF90010BB13 /* WikipediaService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -480,6 +536,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E2602792E66F6980010BB13 /* EntryDetailsViewModel.swift in Sources */,
 				2E245CD02E5338CF0085B958 /* LocationWorker.swift in Sources */,
 				2E713D582E560B52002087EB /* CreateEditEntryConfigurator.swift in Sources */,
 				2E245CA92E5317900085B958 /* AppDelegate.swift in Sources */,
@@ -496,18 +553,24 @@
 				2E713D542E55F6FB002087EB /* CreateEditEntryViewController.swift in Sources */,
 				2E713D552E55F6FB002087EB /* CreateEditEntryWorker.swift in Sources */,
 				2E713D562E55F6FB002087EB /* CreateEditEntryInteractor.swift in Sources */,
+				2E2602832E6700170010BB13 /* WikiModel.swift in Sources */,
+				2E26028D2E6747BA0010BB13 /* MapCellView.swift in Sources */,
 				2E245CFB2E539A630085B958 /* HomeRouter.swift in Sources */,
 				2E713D622E571F52002087EB /* RoundedCornersTextField.swift in Sources */,
 				2E713D652E57638A002087EB /* LocationCellView.swift in Sources */,
+				2E2602862E673E090010BB13 /* TextCellView.swift in Sources */,
+				2E26027F2E66F83E0010BB13 /* MediaCardViewModel.swift in Sources */,
 				2E245CFC2E539A630085B958 /* HomeViewController.swift in Sources */,
 				2E245CFD2E539A630085B958 /* HomeModels.swift in Sources */,
 				2E245CFE2E539A630085B958 /* HomePresenter.swift in Sources */,
 				2E78D4322E5B701600AE99A4 /* SearchLocationContainerPresenter.swift in Sources */,
+				2E26028A2E6746FB0010BB13 /* MediaCardView.swift in Sources */,
 				2E78D4332E5B701600AE99A4 /* SearchLocationContainerModels.swift in Sources */,
 				2E78D4342E5B701600AE99A4 /* SearchLocationContainerRouter.swift in Sources */,
 				2E78D4362E5B701600AE99A4 /* SearchLocationContainerInteractor.swift in Sources */,
 				2ED101382E60AEE60078AFE6 /* Constants.swift in Sources */,
 				2E78D4372E5B701600AE99A4 /* SearchLocationContainerViewController.swift in Sources */,
+				2E26027C2E66F71A0010BB13 /* Box.swift in Sources */,
 				2E96C9692E54E82A00320E27 /* StorageService.swift in Sources */,
 				2E9838F62E6615560005DBF2 /* MemoryCalloutDetailView.swift in Sources */,
 				2E245CFF2E539A630085B958 /* HomeWorker.swift in Sources */,
@@ -516,6 +579,7 @@
 				2ED93D812E5DFE2C00115576 /* MediaContainerViewController.swift in Sources */,
 				2E245D012E539ABD0085B958 /* HomeConfigurator.swift in Sources */,
 				2E713D492E55CD2B002087EB /* MemoryAnnotationView.swift in Sources */,
+				2E2602812E66FAF90010BB13 /* WikipediaService.swift in Sources */,
 				2E245CEB2E534D430085B958 /* GeoEntry.swift in Sources */,
 				2E245CAA2E5317900085B958 /* SceneDelegate.swift in Sources */,
 			);
