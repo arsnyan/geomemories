@@ -1,5 +1,4 @@
 # GeoMemories
-
 **GeoMemories** is a personal map-based diary that allows users to capture and organize their memories by marking significant locations (points of interest or "memories" (or "entries" in code)) on a map. Each memory can be enriched with textual descriptions, photos and video recordings.
 
 [![Swift Version](https://img.shields.io/badge/Swift-6.2-orange.svg)](https://swift.org)
