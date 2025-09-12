@@ -14,6 +14,7 @@ import UIKit
 
 protocol HomeRoutingLogic {
     func routeToCreateEditEntry(geoEntry: GeoEntry?)
+    func routeToEntryDetails(geoEntry: GeoEntry)
 }
 
 protocol HomeDataPassing {
@@ -32,13 +33,12 @@ class HomeRouter: NSObject, HomeRoutingLogic, HomeDataPassing {
         
         var destinationDS = destinationVC.router!.dataStore!
         
-        passDataToCreateEditEntry(source: dataStore!, destination: &destinationDS, entry: geoEntry)
+        passDataToCreateEditEntry(destination: &destinationDS, entry: geoEntry)
         
         navigateToCreateEditEntry(source: viewController!, destination: destinationVC)
     }
     
     private func passDataToCreateEditEntry(
-        source: HomeDataStore,
         destination: inout CreateEditEntryDataStore,
         entry: GeoEntry?
     ) {
@@ -52,12 +52,45 @@ class HomeRouter: NSObject, HomeRoutingLogic, HomeDataPassing {
         let navigationController = UINavigationController(rootViewController: destination)
         if let sheet = navigationController.sheetPresentationController {
             sheet.detents = [.large()]
-            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.largestUndimmedDetentIdentifier = .large
             sheet.prefersGrabberVisible = true
             sheet.prefersScrollingExpandsWhenScrolledToEdge = true
             sheet.prefersEdgeAttachedInCompactHeight = true
             sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
             navigationController.isModalInPresentation = true
+        }
+        source.navigationController?.present(navigationController, animated: true)
+    }
+    
+    func routeToEntryDetails(geoEntry: GeoEntry) {
+        let destinationVC = EntryDetailsViewController(nibName: nil, bundle: nil)
+        passDataToEntryDetails(destination: destinationVC, entry: geoEntry)
+        navigateToEntryDetails(source: viewController!, destination: destinationVC)
+    }
+    
+    private func passDataToEntryDetails(
+        destination: EntryDetailsViewController,
+        entry: GeoEntry
+    ) {
+        let viewModel = EntryDetailsViewModel(entry: entry)
+        destination.viewModel = viewModel
+    }
+    
+    func navigateToEntryDetails(
+        source: HomeViewController,
+        destination: EntryDetailsViewController
+    ) {
+        let navigationController = UINavigationController(rootViewController: destination)
+        if let sheet = navigationController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.largestUndimmedDetentIdentifier = .medium
+            sheet.prefersGrabberVisible = false
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = true
+            sheet.prefersEdgeAttachedInCompactHeight = true
+            sheet.prefersEdgeAttachedInCompactHeight = true
+            sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
+            // Not sure whether I want to make it modal or not yet
+            // navigationController.isModalInPresentation
         }
         source.navigationController?.present(navigationController, animated: true)
     }

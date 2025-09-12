@@ -257,6 +257,38 @@
         }
       }
     },
+    "mapViewSection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3D Map View"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это место на карте"
+          }
+        }
+      }
+    },
+    "mediaCardsSection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attached Media"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прикреплённые медиафайлы"
+          }
+        }
+      }
+    },
     "noLocalizedErrorMessage" : {
       "localizations" : {
         "en" : {
@@ -285,6 +317,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хорошо"
+          }
+        }
+      }
+    },
+    "placeInfoSection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More about this place"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Об этом месте в Wikipedia"
           }
         }
       }
@@ -333,6 +381,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка без описания. Пожалуйста, напишите разработчику, какие шаги вы предприняли перед появлением этой ошибки"
+          }
+        }
+      }
+    },
+    "userInfoSection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Описание"
           }
         }
       }

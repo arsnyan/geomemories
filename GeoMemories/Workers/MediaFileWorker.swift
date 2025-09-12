@@ -220,6 +220,7 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
                 try jpegData.write(to: imagePath)
                 promise(.success(imageName))
             } catch {
+                // swiftlint:disable line_length
                 logger.error("There was an error copying the image to the documents directory: \(error.localizedDescription)")
                 promise(.failure(.copyError(error: error)))
             }
@@ -302,7 +303,7 @@ final class MediaFileWorker: MediaFileWorkerProtocol {
             },
             completion: { [weak self] completion in
                 switch completion {
-                case .success(_):
+                case .success:
                     completionHandler()
                 case .failure(let error):
                     self?.logger.error("Something went wrong while deleting media: \(error)")

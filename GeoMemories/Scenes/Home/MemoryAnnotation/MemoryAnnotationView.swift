@@ -39,6 +39,7 @@ class MemoryAnnotationView: MKAnnotationView {
         detailCalloutAccessoryView = detailView
         
         var config = UIButton.Configuration.glassOrPlain()
+        config.contentInsets = .zero
         config.image = UIImage(systemName: "square.and.pencil")
         let editButton = UIButton(configuration: config)
         editButton.sizeToFit()

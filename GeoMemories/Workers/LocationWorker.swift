@@ -30,6 +30,7 @@ protocol MKLocalSearchCompleterProtocol: AnyObject {
     var resultTypes: MKLocalSearchCompleter.ResultType { get set }
     var region: MKCoordinateRegion { get set }
     var delegate: MKLocalSearchCompleterDelegate? { get set }
+    var results: [MKLocalSearchCompletion] { get }
 }
 
 extension MKLocalSearchCompleter: MKLocalSearchCompleterProtocol {}
@@ -115,6 +116,11 @@ class LocationWorker: NSObject {
         with query: String
     ) -> AnyPublisher<[MKMapItem], LocationError> {
         searchCompleter.queryFragment = query
+        
+        if query == searchCompleter.queryFragment && !searchCompleter.results.isEmpty {
+            completionSubject.send(searchCompleter.results)
+        }
+        
         return completionSubject
             .mapError({ LocationError.failedToFindLocations($0) })
             .flatMap { completions -> AnyPublisher<[MKMapItem], LocationError> in
@@ -122,7 +128,9 @@ class LocationWorker: NSObject {
                     Future<MKMapItem?, LocationError> { promise in
                         let request = MKLocalSearch.Request(completion: completion)
                         
-                        MKLocalSearch(request: request).start { response, error in
+                        let search = MKLocalSearch(request: request)
+                        
+                        search.start { response, error in
                             if let error {
                                 promise(.failure(.failedToFindLocations(error)))
                             } else {

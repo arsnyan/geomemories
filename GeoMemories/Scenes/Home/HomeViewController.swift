@@ -11,7 +11,6 @@ import MapKit
 
 protocol HomeDisplayLogic: AnyObject {
     func displayCurrentLocation(viewModel: Home.SelectCurrentLocation.ViewModel)
-    // TODO: - Make show details functionality and `edit entry` action
     func displayMapEntries(viewModel: Home.ShowMapEntries.ViewModel)
 }
 
@@ -89,7 +88,7 @@ extension HomeViewController: MKMapViewDelegate {
         if control == view.leftCalloutAccessoryView {
             router?.routeToCreateEditEntry(geoEntry: annotation.geoEntry)
         } else {
-            // TODO: - Route to Details View
+            router?.routeToEntryDetails(geoEntry: annotation.geoEntry)
         }
     }
 }
