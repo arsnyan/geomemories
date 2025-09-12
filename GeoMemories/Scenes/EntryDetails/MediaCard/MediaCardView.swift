@@ -29,12 +29,38 @@ final class MediaCardView: UICollectionViewCell {
     )
     private let playPauseButton: UIButton = {
         if #available(iOS 26.0, *) {
-            return UIButton(configuration: .glass())
+            return UIButton(configuration: .clearGlass())
         } else {
             return UIButton(type: .system)
         }
     }()
     private let progressSlider = UISlider()
+    
+    private var hideControlsTask: Task<Void, Never>?
+    private var areControlsVisible = true {
+        didSet {
+            UIView.animate(withDuration: 0.2) { [unowned self] in
+                let alpha: CGFloat = self.areControlsVisible ? 1.0 : 0.0
+                self.playPauseContainer.alpha = alpha
+                self.playPauseButton.alpha = alpha
+                self.progressSlider.alpha = alpha
+            }
+            
+            hideControlsTask?.cancel()
+            
+            if areControlsVisible {
+                hideControlsTask = Task {
+                    try? await Task.sleep(for: .seconds(visibilityTimeUntilGone))
+                    guard !Task.isCancelled else { return }
+                    
+                    await MainActor.run {
+                        areControlsVisible = false
+                    }
+                }
+            }
+        }
+    }
+    private let visibilityTimeUntilGone: Double = 5.0
     
     private var timeObserverToken: Any?
     private var cancellables = Set<AnyCancellable>()
@@ -59,12 +85,17 @@ final class MediaCardView: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        hideControlsTask?.cancel()
+        hideControlsTask = nil
+        
         imageView.image = nil
         imageView.isHidden = true
         playerView.isHidden = true
         
         cleanUpPlayer()
         cancellables.removeAll()
+        
+        areControlsVisible = true
     }
     
     override func layoutSubviews() {
@@ -108,7 +139,6 @@ private extension MediaCardView {
         playerView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
-    // FIXME: - Make play pause button disappear after some time to not obstruct video
     func setupPlayPauseButton() {
         playPauseButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
         // Since Liquid Glass version doesn't support it, no need checking for version
@@ -151,11 +181,19 @@ private extension MediaCardView {
         
         setupPlayPauseButton()
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapVideoContainer))
+        controlsContainer.addGestureRecognizer(tapGesture)
+        
         progressSlider.minimumValue = 0
         progressSlider.addTarget(
             self,
             action: #selector(sliderValueChanged),
             for: .valueChanged
+        )
+        progressSlider.addTarget(
+            self,
+            action: #selector(resetHideControlsTimer),
+            for: .touchDown
         )
         
         controlsContainer.addSubview(progressSlider)
@@ -183,6 +221,8 @@ private extension MediaCardView {
         playerLayer?.videoGravity = .resizeAspect
         playerView.layer.insertSublayer(playerLayer!, at: 0)
         
+        areControlsVisible = true
+        
         addPlayerObservers()
     }
     
@@ -206,6 +246,10 @@ private extension MediaCardView {
                     UIImage(systemName: imageName),
                     for: .normal
                 )
+                
+                if status != .playing {
+                    self?.areControlsVisible = true
+                }
             }
             .store(in: &cancellables)
         
@@ -233,8 +277,17 @@ private extension MediaCardView {
 
 // MARK: - Selector Functions
 @objc private extension MediaCardView {
+    func resetHideControlsTimer() {
+        areControlsVisible = true
+    }
+    
+    func didTapVideoContainer() {
+        resetHideControlsTimer()
+    }
+    
     func playPauseButtonTapped() {
         guard let player else { return }
+        resetHideControlsTimer()
         if player.timeControlStatus == .playing {
             player.pause()
         } else {
