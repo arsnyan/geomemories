@@ -20,11 +20,11 @@
 
 ---
 
-<a name="about"></a>## 1. About
+## <a name="about"></a>1. About
 
 **GeoMemories** is a personal map-based diary that allows users to capture and organize their memories by marking significant locations (points of interest or "memories" (or "entries" in code)) on a map. Each memory can be enriched with textual descriptions, photos and video recordings.
 
-<a name="features"></a>## 2. Features
+## <a name="features"></a>2. Features
 
 *   **Interactive Map:** View your current location and all your saved memories on a dynamic map
 *   **Memory Creation:** Add new memories with a specific location, title, and description
@@ -33,7 +33,7 @@
 *   **Detailed Memory View:** Explore individual memories with all their media content
 *   **User Location Tracking:** Displays the user's current position on the map (with appropriate permissions)
 
-<a name="technical-stack--architecture"></a>## 3. Technical Stack & Architecture
+## <a name="technical-stack--architecture"></a>3. Technical Stack & Architecture
 
 *   **UI Framework:** UIKit
 *   **Architecture:**
@@ -46,13 +46,13 @@
 *   **Media & Graphics:** AVKit is used for playing videos in entry details view
 *   **Code Quality:** **SwiftLint** is integrated and strictly adhered to ensure consistent code style
 
-<a name="screenshots"></a>## 4. Screenshots
+## <a name="screenshots"></a>4. Screenshots
 
 | Home Screen | Create/Edit Memory | Memory Details |
 | :---------: | :----------------: | :------------: |
 | ![](/Screenshots/HomeScreen.png) | ![](/Screenshots/EditScreen.png) | ![](/Screenshots/DetailsScreen.png) |
 
-<a name="setup-and-run"></a>## 5. Setup and Run
+## <a name="setup-and-run"></a>5. Setup and Run
 
 To set up and run GeoMemories on your local machine:
 
@@ -74,7 +74,7 @@ To set up and run GeoMemories on your local machine:
 
 *Note: The first launch might prompt for Location and Camera permissions when using location pin buttons. Please grant them for full functionality.*
 
-<a name="git-flow"></a>## 6. Git Flow
+## <a name="git-flow"></a>6. Git Flow
 
 This project follows the **Git Flow** branching model to manage development and ensure a structured workflow:
 
@@ -84,7 +84,7 @@ This project follows the **Git Flow** branching model to manage development and 
 
 Regular commits and Pull Requests (PRs) were made, following the principles of Git Flow for clean version control and collaboration.
 
-<a name="author"></a>## 7. Author
+## <a name="author"></a>7. Author
 
 **Arsen** - [Link to my LinkedIn Profile](https://www.linkedin.com/in/arsnyan/) | [E-mail](mailto:arsnyan.dev@gmail.com) | [Telegram](https://www.t.me/arsnyan)
 
